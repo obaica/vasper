@@ -54,7 +54,8 @@ if args.params:
 if args.kpoints:
     print("")
     print("")
-    print("### kpoint infomations") print()
+    print("### kpoint infomations")
+    print("")
     kpt = vasprun.as_dict()['input']['kpoints']['kpoints'][0]
     total_kpt = kpt[0] * kpt[1] * kpt[2]
 
