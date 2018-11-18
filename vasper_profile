@@ -1,0 +1,7 @@
+# local environment is set with this file
+
+### mpirun command
+MPIRUN = /usr/local/calc/openmpi/bin/mpirun
+
+### running VASP command
+VASP = /usr/local/calc/vasp/vasp541mpi

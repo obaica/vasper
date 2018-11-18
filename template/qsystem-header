@@ -1,0 +1,8 @@
+#$ -S /bin/zsh
+#$ -cwd
+#$ -N jobname
+#$ -pe mpi* 16
+#$ -e err.log
+#$ -o std.log
+
+ulimit -u unlimited
