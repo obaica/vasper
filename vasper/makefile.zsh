@@ -4,7 +4,7 @@
 # functions for making various files used in VASP calculation
 ###############################################################################
 
-### constants
+### constant values
 VASPER_DIR=$(dirname  $(dirname `which $0`))
 TEMPLATE_DIR="$VASPER_DIR/template"
 PROFILE=${VASPER_DIR}/vasper_profile
