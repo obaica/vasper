@@ -1,4 +1,5 @@
 # local environment is set with this file
+### Please revise this file and set $HOME/.vasperrc
 
 ### mpirun command
 MPIRUN = /usr/local/calc/openmpi/bin/mpirun
