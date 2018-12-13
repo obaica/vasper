@@ -7,7 +7,7 @@
 ### constant values
 VASPER_DIR=$(dirname  $(dirname `which $0`))
 TEMPLATE_DIR="$VASPER_DIR/template"
-PROFILE=${VASPER_DIR}/vasper_profile
+PROFILE=$HOME/.vasperrc
 
 function job_header()
 {
