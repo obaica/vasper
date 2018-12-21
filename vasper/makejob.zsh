@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 ###############################################################################
-# functions for making various files used in VASP calculation
+# functions for making job.sh file
 ###############################################################################
 
 ### constant values
