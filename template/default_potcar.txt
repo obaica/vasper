@@ -1,0 +1,112 @@
+# basically choose refering to https://materialsproject.org/docs/calculations
+## exceptions :
+## Bi use Bi_d
+## Po use Po
+## At use At
+## H use H
+## W use W_sv (W_pv does not exist)
+
+# notes
+## All PBE psp files exist
+## NOT all LDA psp files exist, lacking in the following elements
+## Cf Dy Er Eu Gd Ho Lu Nd Pm Pr Sm Tb Tm Yb
+
+# default choice
+## ex. Ag => choose Ag_LDA and Ag_PBE
+Ac
+Ag
+Al
+Am
+Ar
+As
+At
+Au
+B_s
+Ba_sv
+Be_sv
+Bi_d
+Br
+C_s
+Ca_pv
+Cd
+Ce
+Cf
+Cl
+Cm
+Co
+Cr_pv
+Cs_sv
+Cu_pv
+Dy_3
+Er_3
+Eu
+F_s
+Fe_pv
+Fr_sv
+Ga_d
+Gd
+Ge_d
+H
+He
+Hf_pv
+Hg
+Ho_3
+I
+In_d
+Ir
+K_sv
+Kr
+La
+Li_sv
+Lu_3
+Mg_pv
+Mn_pv
+Mo_pv
+N_s
+Na_pv
+Nb_pv
+Nd_3
+Ne
+Ni_pv
+Np
+O_s
+Os_pv
+P
+Pa
+Pb_d
+Pd
+Pm_3
+Po
+Pr_3
+Pt
+Pu
+Ra_sv
+Rb_sv
+Re_pv
+Rh_pv
+Rn
+Ru_pv
+S
+Sb
+Sc_sv
+Se
+Si
+Sm_3
+Sn_d
+Sr_sv
+Ta_pv
+Tb_3
+Tc_pv
+Te
+Th
+Ti_pv
+Tl_d
+Tm_3
+U
+V_sv
+W_sv
+Xe
+Y_sv
+Yb
+Zn
+Zr_sv
