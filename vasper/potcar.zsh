@@ -5,10 +5,6 @@
 ###############################################################################
 
 ### constant values
-VASPER_DIR=$(dirname  $(dirname `which $0`))
-TEMPLATE_DIR="$VASPER_DIR/template"
-PROFILE=$HOME/.vasperrc
-POT_DIR=`cat $PROFILE | grep "POT_DIR = " | sed s/"POT_DIR = "/""/g`
 DEFAULT_POTCAR="$TEMPLATE_DIR/default_potcar.txt"
 
 ### functions

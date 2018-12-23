@@ -4,11 +4,8 @@
 # functions for making INCAR file
 ###############################################################################
 
-### constant values
-VASPER_DIR=$(dirname  $(dirname `which $0`))
-MODULE_DIR=$VASPER_DIR/vasper
-TEMPLATE_DIR="$VASPER_DIR/template"
-INCAR_RELAX_SAMPLE=$TEMPLATE_DIR/INCAR_relax
+### constants
+INCAR_RELAX_SAMPLE="$TEMPLATE_DIR/INCAR_relax"
 
 function mk_incar_relax()
 {

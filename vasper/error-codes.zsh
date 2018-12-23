@@ -4,11 +4,6 @@
 # make various error codes
 ###############################################################################
 
-### constants
-THIS_FILE=`which $0`
-VASPER_DIR=$(dirname $(dirname $THIS_FILE))
-MODULE_DIR=$VASPER_DIR/vasper
-
 ### nothing was excuted
 function nothing_excuted()
 {

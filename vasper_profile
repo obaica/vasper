@@ -12,6 +12,6 @@ POT_DIR="/path/to/potcardb_directory"
 
 
 # You must not revise the environment varialbes below
-VASPER_DIR=$(dirname  $(dirname `which $0`))
+VASPER_DIR=$(dirname  $(dirname `which vasper-makefile.zsh`))
 MODULE_DIR="$VASPER_DIR/vasper"
 TEMPLATE_DIR="$VASPER_DIR/template"

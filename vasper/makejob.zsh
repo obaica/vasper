@@ -4,11 +4,6 @@
 # functions for making job.sh file
 ###############################################################################
 
-### constant values
-VASPER_DIR=$(dirname  $(dirname `which $0`))
-TEMPLATE_DIR="$VASPER_DIR/template"
-PROFILE=$HOME/.vasperrc
-
 function job_header()
 {
   ##### $1: jobname
@@ -17,7 +12,5 @@ function job_header()
 
 function vasprun_command()
 {
-  local MPIRUN=`cat $PROFILE | grep "MPIRUN = " | sed s/"MPIRUN = "/""/g`
-  local VASP=`cat $PROFILE | grep "VASP = " | sed s/"VASP = "/""/g`
   echo "$MPIRUN $VASP"
 }

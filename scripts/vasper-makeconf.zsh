@@ -33,10 +33,8 @@ function usage()
 EOF
 }
 
-### constants
-THIS_FILE=`which $0`
-VASPER_DIR=$(dirname $(dirname $THIS_FILE))
-MODULE_DIR=$VASPER_DIR/vasper
+### envs
+source $HOME/.vasperrc
 
 ### error codes
 source $MODULE_DIR/error-codes.zsh
