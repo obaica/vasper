@@ -33,7 +33,12 @@ function get_enmax_from_potcar()
 function make_default_potcar_from_elements()
 {
   ##### $1 : element names, ex. "Na Cl"
-  ##### $2 : LDA or PBE
+  ##### $2 : LDA or PBE or PBEsol
+  if [ "$2" = "PBEsol" ]; then
+    POTTYPE="PBE"
+  else
+    POTTYPE="$2"
+  fi
   ELES=(`echo $1`)
   touch POTCAR
   echo "POTCAR database directory : $POT_DIR"
@@ -42,7 +47,7 @@ function make_default_potcar_from_elements()
     POT_F_NAME=`cat $TEMPLATE_DIR/default_potcar.txt |
                 grep -v "#" |
                 grep "${i}" |
-                grep -v "${i}[a-zA-Z]"`_${2}
+                grep -v "${i}[a-zA-Z]"`_${POTTYPE}
     if [ -e $POT_DIR/$POT_F_NAME ]; then
       echo "writing $POT_F_NAME to POTCAR"
       cat $POT_DIR/$POT_F_NAME >> POTCAR

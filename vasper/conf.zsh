@@ -28,21 +28,11 @@ function revise_param()
     exit 251
   fi
   PARAM_LINE_NUM=`cat "$1" | grep -n "$2 = " | sed -e 's/:.*//g'`
-  OLD_PARAM=`echo $PARAM_LINE | sed s/"$2 = "/""/g`
-  NEW_PARAM_LINE=`echo $PARAM_LINE | sed s/"$OLD_PARAM"/"\"$3\""/g`
+  OLD_PARAM=`echo $PARAM_LINE | sed s/"$2 = "/""/g | sed s/" "/""/g`
+  NEW_PARAM_LINE=`echo $PARAM_LINE | sed s/"$OLD_PARAM"/"$3"/g`
   tmpfile=$(mktemp)
   sed -e "${PARAM_LINE_NUM}d" $1 >> $tmpfile
-  sed -i -e "${PARAM_LINE_NUM}i $NEW_PARAM_LINE" $tmpfile
+  sed -i -e "${PARAM_LINE_NUM}i `echo $NEW_PARAM_LINE`" $tmpfile
   rm -f $1
   mv $tmpfile $1
-}
-
-function set_params_from_conf()
-{
-  ##### $1: conf file
-  PARAM_NAMES=(`cat $1 | grep " = " | cut -d " " -f 1`)
-  for PARAM in $PARAM_NAMES
-  do
-    P_$PARAM=$(echo `cat $1 | grep "$PARAM = " | sed s/"$PARAM = "/""/g`)
-  done
 }

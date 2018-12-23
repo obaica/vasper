@@ -20,7 +20,7 @@ function usage()
         \$2: GGA, ex. "PBEsol"
 
     --job           make job.sh
-        \$1: run mode 'vasp'
+        \$1: run mode 'relax'
         \$2: jobname
 
     --kpoints       make KPOINTS
@@ -33,7 +33,7 @@ function usage()
     --potcar        make job.sh
         automatically read POSCAR to extract elements
         \$1: run mode 'default'
-        \$2: psp "LDA" or "PBE"
+        \$2: psp "LDA" or "PBE" or "PBEsol"
 
 
   Exit:
@@ -85,8 +85,8 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
   file_does_not_exist_check "job.sh"
   job_header $2 > "job.sh"
   echo ""
-  if [ "$1" = "vasp" ]; then
-    vasprun_command >> "job.sh"
+  if [ "$1" = "relax" ]; then
+    vasprun_command >> "job_relax.sh"
   fi
   exit 0
 fi

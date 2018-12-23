@@ -15,11 +15,11 @@ function mk_incar_relax()
   ENCUT_LINE=`grep -n ENCUT $INCAR_RELAX_SAMPLE | sed -e 's/:.*//g'`
   tmpfile=$(mktemp)
   sed -e "${ENCUT_LINE}d" $INCAR_RELAX_SAMPLE > $tmpfile
-  sed -i -e "${ENCUT_LINE}i \     ENCUT = ${ENCUT}" $tmpfile
+  sed -i -e "${ENCUT_LINE}i ENCUT = ${ENCUT}" $tmpfile
   cat $tmpfile > INCAR
   rm $tmpfile
   if [[ "$2" = "PBEsol" ]]; then
-    echo "       GGA = PS" >> INCAR
+    echo "GGA = PS" >> INCAR
   fi
 }
 
@@ -35,4 +35,13 @@ function revise_encut()
     ENCUT=$1
   fi
   echo $ENCUT
+}
+
+function revise_incar_param()
+{
+  ##### $1: conf file
+  ##### $2: param name
+  ##### $3: var
+  source $MODULE_DIR/conf.zsh
+  revise_param $1 $2 $3
 }
