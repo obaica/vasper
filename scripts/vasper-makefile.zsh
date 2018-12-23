@@ -71,8 +71,8 @@ if [[ -n "${opthash[(i)--incar_relax]}" ]]; then
    ##### $2: GGA, if "PBEsol" then GGA = PS
   source $MODULE_DIR/incar.zsh
   argnum_check "2" "$#"
-  file_exists_check "INCAR"
-  file_does_not_exist_check "POTCAR"
+  file_does_not_exist_check "INCAR"
+  file_exists_check "POTCAR"
   mk_incar_relax "$1" "$2"
   exit 0
 fi
@@ -82,7 +82,7 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
   ##### $2: jobname
   source $MODULE_DIR/makejob.zsh
   argnum_check "2" "$#"
-  file_exists_check "job.sh"
+  file_does_not_exist_check "job.sh"
   job_header $2 > "job.sh"
   echo ""
   if [ "$1" = "vasp" ]; then
@@ -98,7 +98,7 @@ if [[ -n "${opthash[(i)--kpoints]}" ]]; then
   ##### $3: 'Monkhorst' or 'Gamma' => shift, ex. "0 0 0"
   #####     'band' => posfile, ex. "POSCAR"
   argnum_check "3" "$#"
-  file_exists_check "KPOINTS"
+  file_does_not_exist_check "KPOINTS"
   if [ "$1" = "band" ]; then
     $MODULE_DIR/kpoints.py --style="$1" --knum="$2" -c="$3"
   else
@@ -111,8 +111,8 @@ if [[ -n "${opthash[(i)--potcar]}" ]]; then
   ##### $1: run mode "default"
   ##### $2: psp "LDA" or "PBE"
   argnum_check "2" "$#"
-  file_exists_check "POTCAR"
-  file_does_not_exist_check "POSCAR"
+  file_does_not_exist_check "POTCAR"
+  file_exists_check "POSCAR"
   source $MODULE_DIR/potcar.zsh
   if [ "$1" = "default" ]; then
     make_default_potcar_from_poscar "POSCAR" "$2"

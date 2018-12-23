@@ -55,8 +55,8 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
    ##### $2: jobname
   source $MODULE_DIR/incar.zsh
   argnum_check "2" "$#"
-  file_exists_check "INCAR"
-  file_does_not_exist_check "POTCAR"
+  file_does_not_exist_check "INCAR"
+  file_exists_check "POTCAR"
   mk_incar_relax "$1" "$2"
   exit 0
 fi

@@ -55,7 +55,7 @@ if [[ -n "${opthash[(i)--raw_data]}" ]]; then
   ##### $1: abs path to POSCAR
   ##### $2: tolerance parse to phonopy
   argnum_check "2" "$#"
-  file_exists_check "raw_data"
+  file_does_not_exist "raw_data"
   mkdir raw_data
   cp $1 raw_data
   cd raw_data
@@ -70,7 +70,7 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   ##### $1: relax conf file
   argnum_check "1" "$#"
   set_param_from_conf "$3"
-  file_exists_check "$P_DIRNAME"
+  file_does_not_exist "$P_DIRNAME"
   mkdir $1
   cp $2 $3 $1
   cd $1

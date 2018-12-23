@@ -31,8 +31,8 @@ function argnum_check()
   fi
 }
 
-### check file exists
-function file_exists_check()
+### check file does not exist
+function file_does_not_exist_check()
 {
   ##### $1: check filename
   if [ -e "$1" ]; then
@@ -42,8 +42,8 @@ function file_exists_check()
   fi
 }
 
-### check file does not exist
-function file_does_not_exist_check()
+### check file exists
+function file_exists_check()
 {
   ##### $1: check filename
   if [ ! -e "$1" ]; then
