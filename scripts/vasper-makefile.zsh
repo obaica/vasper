@@ -14,6 +14,9 @@ function usage()
 
     -h evoke function usage
 
+    --conf         make conf file
+        \$1: filetype 'relax'
+
     --incar_relax   make INCAR for relax
         if ENCUT is less than 10, automatically read 'POTCAR' for extructing ENMAX and ENCUT=ENMAX*ENCUT
         \$1: ENCUT
@@ -34,7 +37,6 @@ function usage()
         automatically read POSCAR to extract elements
         \$1: run mode 'default'
         \$2: psp "LDA" or "PBE" or "PBEsol"
-
 
   Exit:
     0   : normal
@@ -57,12 +59,19 @@ source $MODULE_DIR/error-codes.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -incar_relax -job -kpoints \
+zparseopts -D -A opthash -- h -conf -incar_relax -job -kpoints \
            -potcar
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
   usage
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--conf]}" ]]; then
+  ##### $1: filetype 'relax'
+  file_does_not_exist_check "$1.conf"
+  cp $TEMPLATE_DIR/$1.conf .
   exit 0
 fi
 
