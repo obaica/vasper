@@ -1,40 +1,22 @@
 #!/usr/bin/zsh
 
 ###############################################################################
-# make various files used in VASP calculation
+# make various directories
 ###############################################################################
 
 ### usage
 function usage()
 {
   cat <<EOF
-  This file makes various files used in VASP calculation.
+  This file makes various directories.
 
   Options:
 
     -h evoke function usage
 
-    --incar_relax   make INCAR for relax
-        if ENCUT is less than 10, automatically read 'POTCAR' for extructing ENMAX and ENCUT=ENMAX*ENCUT
-        \$1: ENCUT
-        \$2: GGA, ex. "PBEsol"
-
-    --job           make job.sh
-        \$1: run mode 'vasp'
-        \$2: jobname
-
-    --kpoints       make KPOINTS
-        \$1: run mode 'Monkhorst' or 'Gamma' or 'band'
-        \$2: kpoints 'Monkhorst' or 'Gamma' , ex. "6 6 6"
-                     'band' , ex. 100
-        \$3: 'Monkhorst' or 'Gamma' => shift, ex. "0 0 0"
-             'band' => posfile, ex. "POSCAR"
-
-    --potcar        make job.sh
-        automatically read POSCAR to extract elements
-        \$1: run mode 'default'
-        \$2: psp "LDA" or "PBE"
-
+    --raw_data      make raw_data directory
+        \$1: abs path to POSCAR
+        \$2: tolerance parse to phonopy
 
   Exit:
     0   : normal
@@ -173,9 +155,6 @@ if [[ -n "${opthash[(i)--potcar]}" ]]; then
   source $MODULE_DIR/potcar.zsh
   if [ "$1" = "default" ]; then
     make_default_potcar_from_poscar "POSCAR" "$2"
-    if [ "$?" = "252" ]; then
-      exit 252
-    fi
   else
     unexpected_args "$1"
   fi
