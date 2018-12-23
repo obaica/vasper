@@ -18,9 +18,8 @@ function usage()
         \$1: abs path to POSCAR
         \$2: tolerance parse to phonopy, 1e-5 is phonopy default
 
-    --relax_rough   make relax_rough directory
-        read raw_data directory automatically
-        EDIFF=1e-6, EDIFF=1e-4
+    --relax         make relax directory
+        \$1: relax conf file
 
   Exit:
     0   : normal
@@ -38,12 +37,13 @@ EOF
 ### envs
 source $HOME/.vasperrc
 
-### error codes
+### modules
 source $MODULE_DIR/error-codes.zsh
+source $MODULE_DIR/conf.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -raw_data
+zparseopts -D -A opthash -- h -raw_data -relax
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
@@ -65,3 +65,21 @@ if [[ -n "${opthash[(i)--raw_data]}" ]]; then
   cd -
   exit 0
 fi
+
+if [[ -n "${opthash[(i)--relax]}" ]]; then
+  ##### $1: relax conf file
+  argnum_check "1" "$#"
+  set_param_from_conf "$3"
+  file_exists_check "$P_DIRNAME"
+  mkdir $1
+  cp $2 $3 $1
+  cd $1
+    vasper-makefile.zsh --job "vasp" "$P_DIRNAME"
+    vasper-makefile.zsh --potcar "default" "PBE"
+    vasper-makefile.zsh --kpoints "Monkhorst" "6 6 6" "0 0 0"
+    vasper-makefile.zsh --incar_relax "1.3" "PBEsol"
+  cd -
+  exit 0
+fi
+
+nothing_excuted

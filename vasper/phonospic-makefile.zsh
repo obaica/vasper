@@ -208,7 +208,8 @@ function mk_INCAR_relax()
   ENCUT_LINE=`grep -n ENCUT $INCAR_RELAX_SAMPLE | sed -e 's/:.*//g'`
   tmpfile=$(mktemp)
   sed -e "${ENCUT_LINE}d" $INCAR_RELAX_SAMPLE > $tmpfile
-  sed -i -e "${ENCUT_LINE}i \     ENCUT = ${ENCUT}" $tmpfile
+  echo $tmpfile
+  # sed -i -e "${ENCUT_LINE}i \     ENCUT = ${ENCUT}" $tmpfile
 
   cat $tmpfile
   rm $tmpfile
