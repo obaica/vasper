@@ -1,6 +1,6 @@
       PREC = Accurate
     IBRION = 2
-       NSW = 100
+       NSW = 40
     NELMIN = 10
       NELM = 40
       ISIF = 3

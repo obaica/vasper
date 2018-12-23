@@ -2,10 +2,16 @@
 ### Please revise this file and set $HOME/.vasperrc
 
 ### mpirun command
-MPIRUN = /path/to/mpirun
+MPIRUN="/path/to/mpirun"
 
 ### running VASP command
-VASP = /path/to/vasp541mpi
+VASP="/path/to/vasp541mpi"
 
 ### POTCAR Database
-POT_DIR = /path/to/potcardb_directory
+POT_DIR="/path/to/potcardb_directory"
+
+
+# You must not revise the environment varialbes below
+VASPER_DIR=$(dirname  $(dirname `which $0`))
+MODULE_DIR="$VASPER_DIR/vasper"
+TEMPLATE_DIR="$VASPER_DIR/template"
