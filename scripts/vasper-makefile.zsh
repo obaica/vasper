@@ -15,8 +15,8 @@ function usage()
     -h evoke function usage
 
     --incar_relax   make INCAR for relax
-        if ENCUT is, for example, 1.3 , automatically read 'POTCAR' \
-        for extructing ENMAX
+        if ENCUT is less than 10, automatically read 'POTCAR' \
+        for extructing ENMAX and ENCUT=ENMAX*$1
         \$1: ENCUT
         \$2: GGA, ex. "PBEsol"
 
@@ -31,6 +31,12 @@ function usage()
         \$3: 'Monkhorst' or 'Gamma' => shift, ex. "0 0 0"
              'band' => posfile, ex. "POSCAR"
 
+    --potcar        make job.sh
+        automatically read POSCAR to extract elements used
+        \$1: run mode 'default'
+        \$2: psp "LDA" or "PBE"
+
+
   Exit:
     0   : normal
     1   : unexpected error
@@ -39,6 +45,7 @@ function usage()
     254 : The number of argments were different from expected.
     253 : The file you tried to make already exists.
     252 : The file which needs to process does not exist.
+    251 : unexpected argments were parsed
 
 EOF
 }
@@ -47,8 +54,6 @@ EOF
 THIS_FILE=`which $0`
 VASPER_DIR=$(dirname $(dirname $THIS_FILE))
 MODULE_DIR=$VASPER_DIR/vasper
-
-### source
 
 ### nothing was excuted
 function nothing_excuted()
@@ -94,14 +99,24 @@ function file_does_not_exist_check()
   ##### $1: check filename
   if [ ! -e "$1" ]; then
     echo "file does not exist : $1"
-      echo "exit(252)"
+    echo "exit(252)"
     exit 252
   fi
 }
 
+### check keys of args
+function unexpected_args()
+{
+  ##### $1: unexpected_argment
+  echo "unexpected argments parsed : $1"
+  echo "exit(251)"
+  exit 251
+}
+
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -incar_relax -job -kpoints
+zparseopts -D -A opthash -- h -incar_relax -job -kpoints \
+           -potcar
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
@@ -146,6 +161,24 @@ if [[ -n "${opthash[(i)--kpoints]}" ]]; then
     $MODULE_DIR/kpoints.py --style="$1" --knum="$2" -c="$3"
   else
     $MODULE_DIR/kpoints.py --style="$1" --kpts="$2" --shift="$3"
+  fi
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--potcar]}" ]]; then
+  ##### $1: run mode "default"
+  ##### $2: psp "LDA" or "PBE"
+  argnum_check "2" "$#"
+  file_exists_check "POTCAR"
+  file_does_not_exist_check "POSCAR"
+  source $MODULE_DIR/potcar.zsh
+  if [ "$1" = "default" ]; then
+    make_default_potcar_from_poscar "POSCAR" "$2"
+    if [ "$?" = "252" ]; then
+      exit 252
+    fi
+  else
+    unexpected_args "$1"
   fi
   exit 0
 fi
