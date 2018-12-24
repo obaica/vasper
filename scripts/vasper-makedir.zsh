@@ -74,12 +74,17 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   source $1
   file_exists_check "$P_POSFILE"
   file_does_not_exist_check "$P_DIRNAME"
-  echo "making $P_DIRNAME directory"
-  echo ""
-  mkdir $P_DIRNAME
-  cp $1 $P_POSFILE $P_DIRNAME
-  cd $P_DIRNAME
   touch "vasper.log"
+  echo "making $P_DIRNAME directory" | tee -a "vasper.log"
+  echo "" | tee -a "vasper.log"
+  mkdir $P_DIRNAME
+  echo "coping $P_DIRNAME directory" | tee -a "vasper.log"
+  echo "POSCAR file : `pwd`/$P_POSFILE"
+  echo "" | tee -a "vasper.log"
+  cp $1 $P_DIRNAME
+  cp $P_POSFILE $P_DIRNAME/POSCAR
+  mv "vasper.log" $P_DIRNAME
+  cd $P_DIRNAME
   echo "~~ making job_relax.sh ~~" | tee -a "vasper.log"
   echo "job name : $P_JOBNAME" | tee -a "vasper.log"
   echo "" | tee -a "vasper.log"

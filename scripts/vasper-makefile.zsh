@@ -92,7 +92,7 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
   source $MODULE_DIR/makejob.zsh
   argnum_check "2" "$#"
   file_does_not_exist_check "job.sh"
-  job_header $2 > "job.sh"
+  job_header $2 > "job_relax.sh"
   echo ""
   if [ "$1" = "relax" ]; then
     vasprun_command >> "job_relax.sh"
