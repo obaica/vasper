@@ -78,7 +78,7 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   echo "making $P_DIRNAME directory" | tee -a "vasper.log"
   echo "" | tee -a "vasper.log"
   mkdir $P_DIRNAME
-  echo "coping $P_DIRNAME directory" | tee -a "vasper.log"
+  echo "coping POSFILE in  $P_DIRNAME directory" | tee -a "vasper.log"
   echo "POSCAR file : `pwd`/$P_POSFILE"
   echo "" | tee -a "vasper.log"
   cp $1 $P_DIRNAME

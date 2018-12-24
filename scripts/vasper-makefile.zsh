@@ -14,7 +14,7 @@ function usage()
 
     -h evoke function usage
 
-    --conf         make conf file
+    --get_conf      make conf file
         \$1: filetype 'relax'
 
     --incar_relax   make INCAR for relax
@@ -38,6 +38,12 @@ function usage()
         \$1: run mode 'default'
         \$2: psp "LDA" or "PBE" or "PBEsol"
 
+    --revise_setting    revise conf or INCAR setting
+        if cannot find 'variable name', make new line
+        \$1: filename (support filetype : *.conf , INCAR)
+        \$2: variable name
+        \$3: revise name
+
   Exit:
     0   : normal
     1   : unexpected error
@@ -59,8 +65,8 @@ source $MODULE_DIR/error-codes.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -conf -incar_relax -job -kpoints \
-           -potcar
+zparseopts -D -A opthash -- h -get_conf -incar_relax -job -kpoints \
+           -potcar -revise_setting
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
@@ -68,7 +74,7 @@ if [[ -n "${opthash[(i)-h]}" ]]; then
   exit 0
 fi
 
-if [[ -n "${opthash[(i)--conf]}" ]]; then
+if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   ##### $1: filetype 'relax'
   file_does_not_exist_check "$1.conf"
   cp $TEMPLATE_DIR/$1.conf .
@@ -93,7 +99,7 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
   argnum_check "2" "$#"
   file_does_not_exist_check "job.sh"
   job_header $2 > "job_relax.sh"
-  echo ""
+  echo "" >> "job_relax.sh"
   if [ "$1" = "relax" ]; then
     vasprun_command >> "job_relax.sh"
   fi
@@ -130,6 +136,24 @@ if [[ -n "${opthash[(i)--potcar]}" ]]; then
     fi
   else
     unexpected_args "$1"
+  fi
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--revise_setting]}" ]]; then
+  ##### $1: filename (support filetype : *.conf , INCAR)
+  ##### $2: variable name
+  ##### $3: revise name
+  argnum_check "3" "$#"
+  file_exists_check "$1"
+  if [ "$1" = "INCAR" ]; then
+    source $MODULE_DIR/incar.zsh
+    make_new_incar_line_when_not_found "$1" "$2" "$3"
+  elif `echo "$1" | grep -q ".conf"` ; then
+    source $MODULE_DIR/conf.zsh
+    make_new_conf_line_when_not_found "$1" "$2" "$3"
+  else
+    unexpected_args $1
   fi
   exit 0
 fi
