@@ -24,8 +24,7 @@ function mk_incar_relax()
 
 function revise_encut()
 {
-  ##### if $1 is less than 10, read ENMAX from POTCAR and excute ENMAX * $1
-  ##### $1: ENCUT "1.3" or "500"
+  ##### if $1 is less than 10, read ENMAX from POTCAR and excute ENMAX * $1 #### $1: ENCUT "1.3" or "500"
   if [ `echo $(($1<10))` -eq 1 ]; then
     source $MODULE_DIR/potcar.zsh
     ENMAX=`get_enmax_from_potcar "POTCAR"`
@@ -34,6 +33,26 @@ function revise_encut()
     ENCUT=$1
   fi
   echo $ENCUT
+}
+
+function remove_incar_setting()
+{
+  ##### $1: incar file
+  ##### $2: param name
+  if [ `cat $1 | grep "$2 = "` = "" ]; then
+    echo "param : $2 does not exist in $1"
+    echo "exit(251)"
+    exit 251
+  else
+    echo "remove `grep $2 = $1`"
+    tmpfile=$(mktemp)
+    grep -v "$2 = " "$1" >> $tmpfile
+    rm -f $1
+    mv $tmpfile $1
+    echo ""
+    echo "~~ removed $1 ~~"
+    cat $1
+  fi
 }
 
 function revise_incar_param()
@@ -54,8 +73,7 @@ function revise_incar_param()
   mv $tmpfile $1
   echo ""
   echo "~~ revised $1 ~~"
-  cat $1
-}
+  cat $1 }
 
 function make_new_incar_line_when_not_found()
 {
@@ -72,3 +90,38 @@ function make_new_incar_line_when_not_found()
     cat $1
   fi
 }
+
+function mk_incar_band()
+{
+  ##### $1: INCAR used in relax
+  revise_incar_param $1 "IBRION" "-1"
+  revise_incar_param $1 "NSW" "0"
+  revise_incar_param $1 "ISMEAR" "0"
+  revise_incar_param $1 "LCHARG" ".TRUE."
+  echo "# ICHARG = 11" >> $1
+}
+
+function mk_incar_dos()
+{
+  ##### $1: INCAR used in relax
+  revise_incar_param $1 "IBRION" "-1"
+  revise_incar_param $1 "NSW" "0"
+  revise_incar_param $1 "ISMEAR" "-5"
+  revise_incar_param $1 "LCHARG" ".TRUE."
+  make_new_incar_line_when_not_found $1 "LORBIT" "11"
+  echo "# ICHARG = 11" >> $1
+}
+
+function mk_incar_lobster()
+{
+  ##### $1: INCAR used in relax
+  revise_incar_param $1 "IBRION" "-1"
+  revise_incar_param $1 "NSW" "0"
+  revise_incar_param $1 "ISMEAR" "0"
+  revise_incar_param $1 "LCHARG" ".TRUE."
+  revise_incar_param $1 "LWAVE" ".TRUE."
+  make_new_incar_line_when_not_found $1 "LORBIT" "11"
+  make_new_incar_line_when_not_found $1 "ISYM" "-1"
+  echo "# ICHARG = 11" >> $1
+}
+

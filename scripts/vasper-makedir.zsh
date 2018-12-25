@@ -14,6 +14,18 @@ function usage()
 
     -h evoke function usage
 
+    --band          make band directory
+        \$1: relax dirname
+        \$2: new directory name
+
+    --dos           make dos directory
+        \$1: relax dirname
+        \$2: new directory name
+
+    --lobster       make lobster directory
+        \$1: relax dirname
+        \$2: new directory name
+
     --raw_data      make raw_data directory
         \$1: abs path to POSCAR
         \$2: tolerance parse to phonopy, 1e-5 is phonopy default
@@ -44,13 +56,91 @@ source $MODULE_DIR/incar.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -raw_data -relax
+zparseopts -D -A opthash -- h -band -dos -lobster -raw_data -relax
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
   usage
   exit 0
 fi
+
+if [[ -n "${opthash[(i)--band]}" ]]; then
+  ##### $1: relax dirname
+  ##### $2: new directory name
+  argnum_check "2" "$#"
+  file_exists_check "$1"
+  file_does_not_exist_check "$2"
+  source $MODULE_DIR/makejob.zsh
+  JOBNAME=`get_jobname_from_file $1/job_relax.sh | sed s/"relax"/"band"/g`
+  RELAX_DIR=$(cd $1; pwd)
+  echo "making $2 directory"
+  echo "copying CONTCAR INCAR in $1 to $2"
+  mkdir $2
+  cp $1/CONTCAR $2/POSCAR
+  cp $1/POTCAR $1/INCAR $2
+  cd $2
+  echo "relax directory : $RELAX_DIR" > "vasper.log"
+  echo "makeing job_dos.sh"
+  vasper-makefile.zsh --job "band" "$JOBNAME"
+  echo "revising KPOINTS"
+  vasper-makefile.zsh --kpoints "band" "100" "POSCAR"
+  echo "revising INCAR"
+  vasper-makefile.zsh --incar_band "INCAR"
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--dos]}" ]]; then
+  ##### $1: relax dirname
+  ##### $2: new directory name
+  argnum_check "2" "$#"
+  file_exists_check "$1"
+  file_does_not_exist_check "$2"
+  source $MODULE_DIR/makejob.zsh
+  JOBNAME=`get_jobname_from_file $1/job_relax.sh | sed s/"relax"/"dos"/g`
+  RELAX_DIR=$(cd $1; pwd)
+  echo "making $2 directory"
+  echo "copying CONTCAR INCAR KPOINTS in $1 to $2"
+  mkdir $2
+  cp $1/CONTCAR $2/POSCAR
+  cp $1/POTCAR $1/INCAR $1/KPOINTS $2
+  cd $2
+  echo "relax directory : $RELAX_DIR" > "vasper.log"
+  echo "makeing job_dos.sh"
+  vasper-makefile.zsh --job "dos" "$JOBNAME"
+  echo "revising KPOINTS"
+  vasper-makefile.zsh --kpoints_multi "KPOINTS" "2"
+  echo "revising INCAR"
+  vasper-makefile.zsh --incar_dos "INCAR"
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--lobster]}" ]]; then
+  ##### $1: relax dirname
+  ##### $2: new directory name
+  argnum_check "2" "$#"
+  file_exists_check "$1"
+  file_does_not_exist_check "$2"
+  source $MODULE_DIR/makejob.zsh
+  JOBNAME=`get_jobname_from_file $1/job_relax.sh | sed s/"relax"/"lobster"/g`
+  RELAX_DIR=$(cd $1; pwd)
+  echo "making $2 directory"
+  echo "copying CONTCAR INCAR KPOINTS in $1 to $2"
+  mkdir $2
+  cp $1/CONTCAR $2/POSCAR
+  cp $1/POTCAR $1/INCAR $1/KPOINTS $2
+  cd $2
+  echo "relax directory : $RELAX_DIR" > "vasper.log"
+  echo "makeing job_dos.sh"
+  vasper-makefile.zsh --job "lobster" "$JOBNAME"
+  echo "revising KPOINTS"
+  vasper-makefile.zsh --kpoints_multi "KPOINTS" "2"
+  echo "revising INCAR"
+  vasper-makefile.zsh --incar_lobster "INCAR"
+  exit 0
+fi
+
+
+
 
 if [[ -n "${opthash[(i)--raw_data]}" ]]; then
   ##### $1: abs path to POSCAR

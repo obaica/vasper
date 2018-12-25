@@ -14,3 +14,25 @@ function vasprun_command()
 {
   echo "$MPIRUN $VASP"
 }
+
+function static_calc()
+{
+    vasprun_command
+    echo 'mv INCAR INCAR_first'
+    echo 'echo ""'
+    echo 'echo "~~ revise INCAR ~~"'
+    echo 'echo "before :"'
+    echo 'cat INCAR_first'
+    echo 'sed s/"# ICHARG = 11"/"ICHARG = 11"/g INCAR_first > INCAR'
+    echo 'echo "after :"'
+    echo 'cat INCAR'
+    echo 'echo ""'
+    echo 'echo "rerun VASP"'
+    vasprun_command
+}
+
+function get_jobname_from_file()
+{
+  ##### $1: jobfile
+  cat $1 | grep "#$ -N" | sed s/"#$ -N "/""/g
+}

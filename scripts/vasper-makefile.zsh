@@ -22,8 +22,17 @@ function usage()
         \$1: ENCUT
         \$2: GGA, ex. "PBEsol"
 
+    --incar_band    make INCAR for band structure
+        \$1: INCAR file used in relax
+
+    --incar_dos     make INCAR for dos
+        \$1: INCAR file used in relax
+
+    --incar_lobster    make INCAR for dos
+        \$1: INCAR file used in relax
+
     --job           make job.sh
-        \$1: run mode 'relax'
+        \$1: run mode 'relax' 'band' 'dos' 'lobster'
         \$2: jobname
 
     --kpoints       make KPOINTS
@@ -33,10 +42,18 @@ function usage()
         \$3: 'Monkhorst' or 'Gamma' => shift, ex. "0 0 0"
              'band' => posfile, ex. "POSCAR"
 
+    --kpoints_multi    make KPOINTS
+        \$1: kptfile, ex. "KPOINTS"
+        \$2: multiply, ex. "0.5"
+
     --potcar        make job.sh
         automatically read POSCAR to extract elements
         \$1: run mode 'default'
         \$2: psp "LDA" or "PBE" or "PBEsol"
+
+    --remove_setting    remove conf or INCAR setting
+        \$1: filename (support filetype : *.conf , INCAR)
+        \$2: variable name
 
     --revise_setting    revise conf or INCAR setting
         if cannot find 'variable name', make new line
@@ -65,8 +82,9 @@ source $MODULE_DIR/error-codes.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -get_conf -incar_relax -job -kpoints \
-           -potcar -revise_setting
+zparseopts -D -A opthash -- h -get_conf -incar_band -incar_dos -incar_lobster \
+           -incar_relax -job -kpoints -kpoints_multi -potcar -remove_setting \
+           -revise_setting
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
@@ -78,6 +96,33 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   ##### $1: filetype 'relax'
   file_does_not_exist_check "$1.conf"
   cp $TEMPLATE_DIR/$1.conf .
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--incar_band]}" ]]; then
+  ##### $1: INCAR file used in relax
+  source $MODULE_DIR/incar.zsh
+  argnum_check "1" "$#"
+  file_exists_check "$1"
+  mk_incar_band "$1"
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--incar_dos]}" ]]; then
+  ##### $1: INCAR file used in relax
+  source $MODULE_DIR/incar.zsh
+  argnum_check "1" "$#"
+  file_exists_check "$1"
+  mk_incar_dos "$1"
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--incar_lobster]}" ]]; then
+  ##### $1: INCAR file used in relax
+  source $MODULE_DIR/incar.zsh
+  argnum_check "1" "$#"
+  file_exists_check "$1"
+  mk_incar_lobster "$1"
   exit 0
 fi
 
@@ -97,11 +142,28 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
   ##### $2: jobname
   source $MODULE_DIR/makejob.zsh
   argnum_check "2" "$#"
-  file_does_not_exist_check "job.sh"
-  job_header $2 > "job_relax.sh"
-  echo "" >> "job_relax.sh"
   if [ "$1" = "relax" ]; then
+    touch "job_relax.sh"
+    job_header $2 >> "job_relax.sh"
+    echo "" >> "job_relax.sh"
     vasprun_command >> "job_relax.sh"
+  elif [ "$1" = "band" ]; then
+    touch "job_band.sh"
+    job_header $2 >> "job_band.sh"
+    echo "" >> "job_band.sh"
+    static_calc >> "job_band.sh"
+  elif [ "$1" = "dos" ]; then
+    touch "job_dos.sh"
+    job_header $2 >> "job_dos.sh"
+    echo "" >> "job_dos.sh"
+    static_calc >> "job_dos.sh"
+  elif [ "$1" = "lobster" ]; then
+    touch "job_lobster.sh"
+    job_header $2 >> "job_lobster.sh"
+    echo "" >> "job_lobster.sh"
+    static_calc >> "job_lobster.sh"
+  else
+    unexpected_args "$1"
   fi
   exit 0
 fi
@@ -122,6 +184,19 @@ if [[ -n "${opthash[(i)--kpoints]}" ]]; then
   exit 0
 fi
 
+if [[ -n "${opthash[(i)--kpoints_multi]}" ]]; then
+  ##### $1: kptfile, ex. "KPOINTS"
+  ##### $2: multiply, ex. "0.5"
+  argnum_check "2" "$#"
+  file_exists_check "$1"
+  echo "multiply (x$2) kpts in $1"
+  $MODULE_DIR/kpoints.py --style="revise" -k="$1" --multiply="$2"
+  echo ""
+  echo "~~ revised KPOINTS ~~"
+  cat KPOINTS
+  exit 0
+fi
+
 if [[ -n "${opthash[(i)--potcar]}" ]]; then
   ##### $1: run mode "default"
   ##### $2: psp "LDA" or "PBE"
@@ -136,6 +211,23 @@ if [[ -n "${opthash[(i)--potcar]}" ]]; then
     fi
   else
     unexpected_args "$1"
+  fi
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--remove_setting]}" ]]; then
+  ##### $1: filename (support filetype : *.conf , INCAR)
+  ##### $2: variable name
+  argnum_check "2" "$#"
+  file_exists_check "$1"
+  if [ "$1" = "INCAR" ]; then
+    source $MODULE_DIR/incar.zsh
+    make_new_incar_line_when_not_found "$1" "$2" "$3"
+  elif `echo "$1" | grep -q ".conf"` ; then
+    source $MODULE_DIR/conf.zsh
+    remove_conf_setting "$1" "$2"
+  else
+    unexpected_args $1
   fi
   exit 0
 fi

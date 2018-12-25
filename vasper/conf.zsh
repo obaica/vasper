@@ -16,6 +16,26 @@ function cat_conf()
   fi
 }
 
+function remove_conf_setting()
+{
+  ##### $1: conf file
+  ##### $2: param name
+  if [ `cat $1 | grep "$2="` = "" ]; then
+    echo "param : $2 does not exist in $1"
+    echo "exit(251)"
+    exit 251
+  else
+    echo "remove `grep $2= $1`"
+    tmpfile=$(mktemp)
+    grep -v "$2=" "$1" >> $tmpfile
+    rm -f $1
+    mv $tmpfile $1
+    echo ""
+    echo "~~ removed $1 ~~"
+    cat $1
+  fi
+}
+
 function revise_conf_param()
 {
   ##### $1: conf file

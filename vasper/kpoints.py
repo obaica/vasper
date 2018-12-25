@@ -13,19 +13,9 @@ This script is about KPOINTS
 import os
 from pprint import pprint
 import argparse
+import numpy as np
 from pymatgen.io import vasp as pmgvasp
 from pymatgen.symmetry.bandstructure import HighSymmKpath
-
-### definitions
-# def check_file_exist(filepath, reverse=False):
-#     if not reverse:
-#         if not os.path.isfile(filepath):
-#             raise ValueError("%s does not exist" % filepath)
-#         else:
-#             print("reading : %s" % filepath)
-#     if reverse:
-#         if os.path.isfile(filepath):
-#             raise ValueError("%s exists" % filepath)
 
 def find_bandpath(structure):
     # First brillouin zone
@@ -80,34 +70,44 @@ def write_kpoints(style, kpts, shift=(0.,0.,0.)):
     else:
         raise ValueError("style : %s is not supported" % style)
 
+def multiply_orig_kpts(kptfile, multiply):
+    ### kptfile => KPOINTS file
+    ### style => multiply
+    kpoints = pmgvasp.inputs.Kpoints.from_file(kptfile)
+    # kpoints.kpts = list(map(int, list(np.array(kpoints.kpts) * multiply)))
+    # kpoints.kpts = list(map(int, list(np.array(kpoints.kpts) * multiply)))
+    new_kpts = np.array(kpoints.kpts) * multiply
+    new_kpts = new_kpts.astype(int).tolist()
+    kpoints.kpts = new_kpts
+    kpoints.write_file("KPOINTS")
 
 if __name__ == "__main__":
     ### Arg-parser
     parser = argparse.ArgumentParser(
-        description="This script shows log of vasprun. \
-                     If you don't specify file path, \
-                     this script reads files in the current directory")
+        description="This script deals with KPOINTS")
 
-#     parser.add_argument('-f', action='store_true',
-#                         help="if file exists, overwirte")
     parser.add_argument('-st', '--style', type=str,
-                        help="'band' or 'Monkhorst' or 'Gamma'")
+                        help="'band' or 'Monkhorst' or 'Gamma' or 'revise'")
     parser.add_argument('-c', '--posfile', type=str, default='POSCAR',
                         help="POSCAR file for 'band' mode")
+    parser.add_argument('-k', '--kptfile', type=str, default='KPOINTS',
+                        help="KPOINTS file for 'revise' mode")
     parser.add_argument('--knum', type=int,
                         help="knum for each band path, ex. 100")
     parser.add_argument('--kpts', type=str,
                         help="kpoints for 'Monkhorst' or 'Gamma' mode \
                               ex. '6 6 6'")
+    parser.add_argument('--multiply', type=float,
+                        help="multiply kpoints for 'revise' mode")
     parser.add_argument('--shift', type=str, default='0 0 0',
                         help="kpoints shift for 'Monkhorst' or 'Gamma' mode \
                               default '0 0 0'")
     args = parser.parse_args()
 
-#     if not args.f:
-#         check_file_exist('KPOINTS', reverse=True)
-
-    if args.style == 'band':
+    ### main
+    if args.style == 'revise':
+        multiply_orig_kpts(args.kptfile, args.multiply)
+    elif args.style == 'band':
         pos = pmgvasp.inputs.Poscar.from_file(args.posfile)
         kp, label = find_bandpath(structure=pos.structure)
         write_bandkpoints(args.knum, kp, label)
