@@ -30,6 +30,9 @@ function usage()
 
     --incar_lobster    make INCAR for dos
         \$1: INCAR file used in relax
+        \$1: vasprun.xml file used in relax
+        \$2: POSCAR file
+        \$3: POTCAR file
 
     --job           make job.sh
         \$1: run mode 'relax' 'band' 'dos' 'lobster'
@@ -45,6 +48,11 @@ function usage()
     --kpoints_multi    make KPOINTS
         \$1: kptfile, ex. "KPOINTS"
         \$2: multiply, ex. "0.5"
+
+    --lobsterin     make lobsterin
+        \$1: posfile
+        \$2: potfile
+        \$3: n th distance
 
     --potcar        make job.sh
         automatically read POSCAR to extract elements
@@ -83,7 +91,7 @@ source $MODULE_DIR/error-codes.zsh
 ### zparseopts
 local -A opthash
 zparseopts -D -A opthash -- h -get_conf -incar_band -incar_dos -incar_lobster \
-           -incar_relax -job -kpoints -kpoints_multi -potcar -remove_setting \
+           -incar_relax -job -kpoints -kpoints_multi -lobsterin -potcar -remove_setting \
            -revise_setting
 
 ### option
@@ -119,10 +127,16 @@ fi
 
 if [[ -n "${opthash[(i)--incar_lobster]}" ]]; then
   ##### $1: INCAR file used in relax
+  ##### $2: vasprun.xml file used in relax
+  ##### $3: POSCAR file
+  ##### $4: POTCAR file
   source $MODULE_DIR/incar.zsh
-  argnum_check "1" "$#"
+  argnum_check "4" "$#"
   file_exists_check "$1"
-  mk_incar_lobster "$1"
+  file_exists_check "$2"
+  file_exists_check "$3"
+  file_exists_check "$4"
+  mk_incar_lobster "$1" "$2" "$3" "$4"
   exit 0
 fi
 
@@ -162,6 +176,8 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
     job_header $2 >> "job_lobster.sh"
     echo "" >> "job_lobster.sh"
     static_calc >> "job_lobster.sh"
+    echo "" >> "job_lobster.sh"
+    lobster_command >> "job_lobster.sh"
   else
     unexpected_args "$1"
   fi
@@ -194,6 +210,22 @@ if [[ -n "${opthash[(i)--kpoints_multi]}" ]]; then
   echo ""
   echo "~~ revised KPOINTS ~~"
   cat KPOINTS
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--lobsterin]}" ]]; then
+  ##### $1: posfile
+  ##### $2: potfile
+  ##### $3: n th distance
+  source $MODULE_DIR/lobsterin.zsh
+  argnum_check "3" "$#"
+  file_exists_check "$1"
+  file_exists_check "$2"
+  file_does_not_exist_check "lobsterin"
+  basisfunctions "$2"
+  autodistance "$1" "$3"
+  mk_detail_files
+  lobsterin_template
   exit 0
 fi
 

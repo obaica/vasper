@@ -71,9 +71,7 @@ function revise_incar_param()
   cat "$1" | sed s/"$PARAM_LINE"/"$2 = $3"/g >> $tmpfile
   rm -f $1
   mv $tmpfile $1
-  echo ""
-  echo "~~ revised $1 ~~"
-  cat $1 }
+}
 
 function make_new_incar_line_when_not_found()
 {
@@ -85,9 +83,6 @@ function make_new_incar_line_when_not_found()
     echo "there is no $2 param in $1 file, so make new line"
     echo "additional line is below"
     echo "$2 = $3" | tee -a $1
-    echo ""
-    echo "~~ revised $1 ~~"
-    cat $1
   fi
 }
 
@@ -115,11 +110,25 @@ function mk_incar_dos()
 function mk_incar_lobster()
 {
   ##### $1: INCAR used in relax
+  ##### $2: vasprun.xml used in relax
+  ##### $3: POSCAR file
+  ##### $4: POTCAR file
+  NBANDS_OUTCAR=`vasper-log.py -vf="$2" -pr | grep \'NBANDS\' | sed -e 's/[^0-9]//g'`
+  echo "NBANDS from vasprun.xml : $NBANDS_OUTCAR"
+  NBANDS_VASPER=`$MODULE_DIR/potcar.py -p=$4 -c=$3 -n`
+  echo "NBANDS from VASPER : $NBANDS_VASPER"
+  if [ "$NBANDS_OUTCAR" -gt "$NBANDS_VASPER" ]; then
+    NBANDS=$NBANDS_OUTCAR
+  else
+    NBANDS=$NBANDS_VASPER
+  fi
+  echo "NBANDS : $NBANDS"
   revise_incar_param $1 "IBRION" "-1"
   revise_incar_param $1 "NSW" "0"
   revise_incar_param $1 "ISMEAR" "0"
   revise_incar_param $1 "LCHARG" ".TRUE."
   revise_incar_param $1 "LWAVE" ".TRUE."
+  make_new_incar_line_when_not_found $1 "NBANDS" "$NBANDS"
   make_new_incar_line_when_not_found $1 "LORBIT" "11"
   make_new_incar_line_when_not_found $1 "ISYM" "-1"
   echo "# ICHARG = 11" >> $1

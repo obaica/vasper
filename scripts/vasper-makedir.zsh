@@ -25,6 +25,7 @@ function usage()
     --lobster       make lobster directory
         \$1: relax dirname
         \$2: new directory name
+        \$3: calculate n th neighbor atoms ex. "2"
 
     --raw_data      make raw_data directory
         \$1: abs path to POSCAR
@@ -117,7 +118,8 @@ fi
 if [[ -n "${opthash[(i)--lobster]}" ]]; then
   ##### $1: relax dirname
   ##### $2: new directory name
-  argnum_check "2" "$#"
+  ##### $3: calculate n th neighbor atoms ex. "2"
+  argnum_check "3" "$#"
   file_exists_check "$1"
   file_does_not_exist_check "$2"
   source $MODULE_DIR/makejob.zsh
@@ -130,17 +132,19 @@ if [[ -n "${opthash[(i)--lobster]}" ]]; then
   cp $1/POTCAR $1/INCAR $1/KPOINTS $2
   cd $2
   echo "relax directory : $RELAX_DIR" > "vasper.log"
-  echo "makeing job_dos.sh"
+  echo "making job_lobster.sh"
   vasper-makefile.zsh --job "lobster" "$JOBNAME"
+  echo ""
   echo "revising KPOINTS"
   vasper-makefile.zsh --kpoints_multi "KPOINTS" "2"
+  echo ""
   echo "revising INCAR"
-  vasper-makefile.zsh --incar_lobster "INCAR"
+  vasper-makefile.zsh --incar_lobster "INCAR" "$RELAX_DIR/vasprun.xml" "POSCAR" "POTCAR"
+  echo ""
+  echo "making lobsterin"
+  vasper-makefile.zsh --lobsterin "POSCAR" "POTCAR" "$3"
   exit 0
 fi
-
-
-
 
 if [[ -n "${opthash[(i)--raw_data]}" ]]; then
   ##### $1: abs path to POSCAR

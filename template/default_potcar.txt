@@ -11,6 +11,9 @@
 ## NOT all LDA psp files exist, lacking in the following elements
 ## Cf Dy Er Eu Gd Ho Lu Nd Pm Pr Sm Tb Tm Yb
 
+# change log
+## 2018/12/27 B, C, N, O, F ; change from atom_s => atom
+
 # default choice
 ## ex. Ag => choose Ag_LDA and Ag_PBE
 Ac
@@ -21,12 +24,12 @@ Ar
 As
 At
 Au
-B_s
+B
 Ba_sv
 Be_sv
 Bi_d
 Br
-C_s
+C
 Ca_pv
 Cd
 Ce
@@ -40,7 +43,7 @@ Cu_pv
 Dy_3
 Er_3
 Eu
-F_s
+F
 Fe_pv
 Fr_sv
 Ga_d
@@ -62,14 +65,14 @@ Lu_3
 Mg_pv
 Mn_pv
 Mo_pv
-N_s
+N
 Na_pv
 Nb_pv
 Nd_3
 Ne
 Ni_pv
 Np
-O_s
+O
 Os_pv
 P
 Pa

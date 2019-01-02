@@ -4,14 +4,15 @@
 ### mpirun command
 MPIRUN="/path/to/mpirun"
 
-### running VASP command
+### running Software command
 VASP="/path/to/vasp541mpi"
+LOBSTER="/path/to/lobster"
 
 ### POTCAR Database
 POT_DIR="/path/to/potcardb_directory"
 
 
-# You must not revise the environment varialbes below
+# You must not revise the environment variables below
 VASPER_DIR=$(dirname  $(dirname `which vasper-makefile.zsh`))
 MODULE_DIR="$VASPER_DIR/vasper"
 TEMPLATE_DIR="$VASPER_DIR/template"

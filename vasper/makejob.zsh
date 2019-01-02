@@ -15,10 +15,17 @@ function vasprun_command()
   echo "$MPIRUN $VASP"
 }
 
+function lobster_command()
+{
+  echo "$LOBSTER"
+}
+
 function static_calc()
 {
     vasprun_command
     echo 'mv INCAR INCAR_first'
+    echo 'mv OUTCAR OUTCAR_first'
+    echo 'mv vasprun.xml vasprun.xml_first'
     echo 'echo ""'
     echo 'echo "~~ revise INCAR ~~"'
     echo 'echo "before :"'
