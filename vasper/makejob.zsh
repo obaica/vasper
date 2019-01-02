@@ -23,6 +23,10 @@ function lobster_command()
 function static_calc()
 {
     vasprun_command
+    echo 'if [ -e "WAVECAR" ]; then'
+    echo '  echo "remove WAVECAR"'
+    echo '  rm -f "WAVECAR"'
+    echo 'fi'
     echo 'mv INCAR INCAR_first'
     echo 'mv OUTCAR OUTCAR_first'
     echo 'mv vasprun.xml vasprun.xml_first'
