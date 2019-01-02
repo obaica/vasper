@@ -20,8 +20,9 @@ function autodistance()
     echo "You can specify less equal $#DISTANCES"
     exit 251
   fi
+  DISTANCE=$(($DISTANCES[$2]+0.01))
   echo "! all pairs in a given distance range (in Angstrom, not in atomic units):" >> lobsterin
-  echo "cohpGenerator from 0.01 to $DISTANCES[$2] orbitalwise" >> lobsterin
+  echo "cohpGenerator from 0.01 to $DISTANCE orbitalwise" >> lobsterin
   echo "" >> lobsterin
 }
 
