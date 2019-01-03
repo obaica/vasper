@@ -12,6 +12,7 @@ function job_header()
 
 function vasprun_command()
 {
+  echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/intel/lib/intel64"
   echo "$MPIRUN $VASP"
 }
 
