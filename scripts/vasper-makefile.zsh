@@ -39,11 +39,13 @@ function usage()
         \$2: jobname
 
     --kpoints       make KPOINTS
-        \$1: run mode 'Monkhorst' or 'Gamma' or 'band'
+        \$1: run mode 'Monkhorst' or 'Gamma' or 'band' or 'auto'
+                 if 'auto', bravais lattice = hexagonal => Gamma
+                                    else                => Monkhorst
         \$2: kpoints 'Monkhorst' or 'Gamma' , ex. "6 6 6"
                      'band' , ex. 100
         \$3: 'Monkhorst' or 'Gamma' => shift, ex. "0 0 0"
-             'band' => posfile, ex. "POSCAR"
+             'band' or 'auto' => posfile, ex. "POSCAR"
 
     --kpoints_multi    make KPOINTS
         \$1: kptfile, ex. "KPOINTS"
@@ -186,14 +188,26 @@ fi
 
 if [[ -n "${opthash[(i)--kpoints]}" ]]; then
   ##### $1: run mode 'Monkhorst' or 'Gamma' or 'band'
+  #####        if 'auto', bravais lattice = hexagonal => Gamma
+  #####                           else                => Monkhorst
   ##### $2: kpoints 'Monkhorst' or 'Gamma' , ex. "6 6 6"
   #####             'band' , ex. 100
   ##### $3: 'Monkhorst' or 'Gamma' => shift, ex. "0 0 0"
-  #####     'band' => posfile, ex. "POSCAR"
+  #####     'band' or 'auto' => posfile, ex. "POSCAR"
   argnum_check "3" "$#"
   file_does_not_exist_check "KPOINTS"
   if [ "$1" = "band" ]; then
     $MODULE_DIR/kpoints.py --style="$1" --knum="$2" -c="$3"
+  elif [ "$1" = "auto" ]; then
+    BRAVAIS=`$MODULE_DIR/poscar.py -c="$3" -b`
+    echo "bravais : $BRAVAIS"
+    if [ "$BRAVAIS" = "hexagonal" ]; then
+      echo "Sampling method : 'Gamma'"
+      $MODULE_DIR/kpoints.py --style="Gamma" --kpts="$2" --shift="0 0 0"
+    else
+      echo "Sampling method : 'Monkhorst'"
+      $MODULE_DIR/kpoints.py --style="Monkhorst" --kpts="$2" --shift="0 0 0"
+    fi
   else
     $MODULE_DIR/kpoints.py --style="$1" --kpts="$2" --shift="$3"
   fi

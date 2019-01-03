@@ -191,8 +191,13 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   echo "sampling method : $P_KSAMP_METHOD" | tee -a "vasper.log"
   echo "sampling num : $P_KNUM" | tee -a "vasper.log"
   echo "shift : $P_KSHIFT" | tee -a "vasper.log"
+  if [ "$P_KSAMP_METHOD" = "auto" ]; then
+    echo "read bravais lattice, 'P_KSHIFT' setting will be ignored" | tee -a "vasper.log"
+    vasper-makefile.zsh --kpoints "$P_KSAMP_METHOD" "$P_KNUM" "POSCAR"
+  else
+    vasper-makefile.zsh --kpoints "$P_KSAMP_METHOD" "$P_KNUM" "$P_KSHIFT"
+  fi
   echo "" | tee -a "vasper.log"
-  vasper-makefile.zsh --kpoints "$P_KSAMP_METHOD" "$P_KNUM" "$P_KSHIFT"
   echo "~~ making INCAR ~~" | tee -a "vasper.log"
   echo "ENCUT : $P_ENCUT" | tee -a "vasper.log"
   echo "EDIFF : $P_EDIFF" | tee -a "vasper.log"
