@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 ###############################################################################
-# functions for making job.sh file
+# functions for making various conf file
 ###############################################################################
 
 function cat_conf()

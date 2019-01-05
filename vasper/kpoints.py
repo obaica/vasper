@@ -70,15 +70,22 @@ def write_kpoints(style, kpts, shift=(0.,0.,0.)):
     else:
         raise ValueError("style : %s is not supported" % style)
 
-def multiply_orig_kpts(kptfile, multiply):
+def revise_file(kptfile, multiply=None, kpts=None):
     ### kptfile => KPOINTS file
-    ### style => multiply
+    ### style => multiply, kpts
     kpoints = pmgvasp.inputs.Kpoints.from_file(kptfile)
-    # kpoints.kpts = list(map(int, list(np.array(kpoints.kpts) * multiply)))
-    # kpoints.kpts = list(map(int, list(np.array(kpoints.kpts) * multiply)))
-    new_kpts = np.array(kpoints.kpts) * multiply
-    new_kpts = new_kpts.astype(int).tolist()
+    if multiply is not None:
+        new_kpts = np.array(kpoints.kpts) * multiply
+        new_kpts = new_kpts.astype(int).tolist()
+        print(new_kpts)
+    elif kpts is not None:
+        # new_kpts = tuple(tuple(kpts)
+        new_kpts = [list(kpts)]
+    else:
+        raise ValueError("Don't specify 'multiply' and 'kpts' at once!")
     kpoints.kpts = new_kpts
+    print(type(new_kpts))
+    print(new_kpts)
     kpoints.write_file("KPOINTS")
 
 if __name__ == "__main__":
@@ -94,10 +101,10 @@ if __name__ == "__main__":
                         help="KPOINTS file for 'revise' mode")
     parser.add_argument('--knum', type=int,
                         help="knum for each band path, ex. 100")
-    parser.add_argument('--kpts', type=str,
+    parser.add_argument('--kpts', type=str, default=None,
                         help="kpoints for 'Monkhorst' or 'Gamma' mode \
                               ex. '6 6 6'")
-    parser.add_argument('--multiply', type=float,
+    parser.add_argument('--multiply', type=float, default=None,
                         help="multiply kpoints for 'revise' mode")
     parser.add_argument('--shift', type=str, default='0 0 0',
                         help="kpoints shift for 'Monkhorst' or 'Gamma' mode \
@@ -106,7 +113,11 @@ if __name__ == "__main__":
 
     ### main
     if args.style == 'revise':
-        multiply_orig_kpts(args.kptfile, args.multiply)
+        if args.kpts is not None:
+            kpts = tuple(map(int, args.kpts.split()))
+        else:
+            kpts = None
+        revise_file(args.kptfile, args.multiply, kpts)
     elif args.style == 'band':
         pos = pmgvasp.inputs.Poscar.from_file(args.posfile)
         kp, label = find_bandpath(structure=pos.structure)

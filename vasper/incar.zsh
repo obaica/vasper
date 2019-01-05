@@ -107,6 +107,13 @@ function mk_incar_dos()
   echo "# ICHARG = 11" >> $1
 }
 
+function mk_incar_fc2()
+{
+  ##### $1: INCAR used in relax
+  revise_incar_param $1 "IBRION" "-1"
+  revise_incar_param $1 "NSW" "0"
+}
+
 function mk_incar_lobster()
 {
   ##### $1: INCAR used in relax

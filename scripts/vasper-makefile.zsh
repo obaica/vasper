@@ -28,6 +28,9 @@ function usage()
     --incar_dos     make INCAR for dos
         \$1: INCAR file used in relax
 
+    --incar_fc2     make INCAR for fc2
+        \$1: INCAR file used in relax
+
     --incar_lobster    make INCAR for dos
         \$1: INCAR file used in relax
         \$1: vasprun.xml file used in relax
@@ -35,7 +38,7 @@ function usage()
         \$3: POTCAR file
 
     --job           make job.sh
-        \$1: run mode 'relax' 'band' 'dos' 'lobster'
+        \$1: run mode 'relax' 'band' 'dos' 'fc2' 'lobster'
         \$2: jobname
 
     --kpoints       make KPOINTS
@@ -50,6 +53,10 @@ function usage()
     --kpoints_multi    make KPOINTS
         \$1: kptfile, ex. "KPOINTS"
         \$2: multiply, ex. "0.5"
+
+    --kpoints_newmesh  make KPOINTS
+        \$1: kptfile, ex. "KPOINTS"
+        \$2: new mesh, ex. "3 3 3"
 
     --lobsterin     make lobsterin
         \$1: posfile
@@ -92,8 +99,8 @@ source $MODULE_DIR/error-codes.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -get_conf -incar_band -incar_dos -incar_lobster \
-           -incar_relax -job -kpoints -kpoints_multi -lobsterin -potcar -remove_setting \
+zparseopts -D -A opthash -- h -get_conf -incar_band -incar_dos -incar_fc2 -incar_lobster \
+           -incar_relax -job -kpoints -kpoints_newmesh -kpoints_multi -lobsterin -potcar -remove_setting \
            -revise_setting
 
 ### option
@@ -124,6 +131,15 @@ if [[ -n "${opthash[(i)--incar_dos]}" ]]; then
   argnum_check "1" "$#"
   file_exists_check "$1"
   mk_incar_dos "$1"
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--incar_fc2]}" ]]; then
+  ##### $1: INCAR file used in relax
+  source $MODULE_DIR/incar.zsh
+  argnum_check "1" "$#"
+  file_exists_check "$1"
+  mk_incar_fc2 "$1"
   exit 0
 fi
 
@@ -173,6 +189,11 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
     job_header $2 >> "job_dos.sh"
     echo "" >> "job_dos.sh"
     static_calc >> "job_dos.sh"
+  elif [ "$1" = "fc2" ]; then
+    touch "job_fc2.sh"
+    job_header $2 >> "job_fc2.sh"
+    echo "" >> "job_fc2.sh"
+    vasprun_command >> "job_fc2.sh"
   elif [ "$1" = "lobster" ]; then
     touch "job_lobster.sh"
     job_header $2 >> "job_lobster.sh"
@@ -181,6 +202,8 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
     echo "" >> "job_lobster.sh"
     lobster_command >> "job_lobster.sh"
   else
+    echo "$1 $2"
+    echo "hogehoge"
     unexpected_args "$1"
   fi
   exit 0
@@ -211,6 +234,19 @@ if [[ -n "${opthash[(i)--kpoints]}" ]]; then
   else
     $MODULE_DIR/kpoints.py --style="$1" --kpts="$2" --shift="$3"
   fi
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--kpoints_newmesh]}" ]]; then
+  ##### $1: kptfile, ex. "KPOINTS"
+  ##### $2: new mesh, ex. "3 3 3"
+  argnum_check "2" "$#"
+  file_exists_check "$1"
+  echo "revise the number of mesh => $1"
+  $MODULE_DIR/kpoints.py --style="revise" -k="$1" --kpts="$2"
+  echo ""
+  echo "~~ revised KPOINTS ~~"
+  cat KPOINTS
   exit 0
 fi
 
