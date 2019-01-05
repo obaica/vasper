@@ -84,8 +84,6 @@ def revise_file(kptfile, multiply=None, kpts=None):
     else:
         raise ValueError("Don't specify 'multiply' and 'kpts' at once!")
     kpoints.kpts = new_kpts
-    print(type(new_kpts))
-    print(new_kpts)
     kpoints.write_file("KPOINTS")
 
 if __name__ == "__main__":

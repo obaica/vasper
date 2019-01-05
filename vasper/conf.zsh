@@ -16,6 +16,29 @@ function cat_conf()
   fi
 }
 
+function disp_conf()
+{
+  ##### $1: filetype
+  ##### $2: dim ex. "3 3 3"
+  ##### $3: 'alm' => temperature
+  ##### $4: 'alm' => the number of displacement
+  if [ "$1" = "alm" ]; then
+    {
+      echo "DIM = $2"
+      echo "TEMPERATURE = $3"
+      echo "DISP_NUM = $4"
+    } > disp_${1}.conf
+  elif [ "$1" = "fc2" -o "$1" = "fc3" ]; then
+    {
+      echo "CREATE_DISPLACEMENTS = .TRUE."
+      echo "CELL_FILENAME = POSCAR-unitcell"
+      echo "DIM = $2"
+    }  > disp_${1}.conf
+  else
+    unexpected_args "$1"
+  fi
+}
+
 function remove_conf_setting()
 {
   ##### $1: conf file

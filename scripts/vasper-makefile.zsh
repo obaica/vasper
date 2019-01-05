@@ -14,8 +14,15 @@ function usage()
 
     -h evoke function usage
 
+    --disp_file    make displaced files
+        \$1: conf file
+
     --get_conf      make conf file
-        \$1: filetype 'relax'
+        \$1: 'vasper_fc2'
+        \$1: 'vasper_relax'
+        \$1: 'vasper_alm'
+        \$1: 'disp_fc2' \$2: dimension(ex. "3 3 3" )
+        \$1: 'disp_alm' \$2: dimension(ex. "3 3 3" ) \$3: temperature \$4: the number of displacements
 
     --incar_relax   make INCAR for relax
         if ENCUT is less than 10, automatically read 'POTCAR' for extructing ENMAX and ENCUT=ENMAX*ENCUT
@@ -23,6 +30,9 @@ function usage()
         \$2: GGA, ex. "PBEsol"
 
     --incar_band    make INCAR for band structure
+        \$1: INCAR file used in relax
+
+    --incar_born    make INCAR for BORN
         \$1: INCAR file used in relax
 
     --incar_dos     make INCAR for dos
@@ -38,7 +48,7 @@ function usage()
         \$3: POTCAR file
 
     --job           make job.sh
-        \$1: run mode 'relax' 'band' 'dos' 'fc2' 'lobster'
+        \$1: run mode 'relax' 'alm' 'band' 'born' 'dos' 'fc2' 'lobster'
         \$2: jobname
 
     --kpoints       make KPOINTS
@@ -99,8 +109,20 @@ source $MODULE_DIR/error-codes.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -get_conf -incar_band -incar_dos -incar_fc2 -incar_lobster \
-           -incar_relax -job -kpoints -kpoints_newmesh -kpoints_multi -lobsterin -potcar -remove_setting \
+zparseopts -D -A opthash -- h \
+           -get_conf \
+           -incar_band \
+           -incar_born \
+           -incar_dos \
+           -incar_fc2 \
+           -incar_lobster \
+           -incar_relax \
+           -job -kpoints \
+           -kpoints_newmesh \
+           -kpoints_multi \
+           -lobsterin \
+           -potcar \
+           -remove_setting \
            -revise_setting
 
 ### option
@@ -109,10 +131,39 @@ if [[ -n "${opthash[(i)-h]}" ]]; then
   exit 0
 fi
 
+if [[ -n "${opthash[(i)--disp]}" ]]; then
+  ##### $1: filetype 'fc2'
+  ##### $2: dim ex. "3 3 3"
+  file_does_not_exist_check "disp_${1}.conf"
+  disp_conf "$1" "$2"
+  exit 0
+fi
+
 if [[ -n "${opthash[(i)--get_conf]}" ]]; then
-  ##### $1: filetype 'relax'
-  file_does_not_exist_check "$1.conf"
-  cp $TEMPLATE_DIR/$1.conf .
+  ##### $1: 'vasper_fc2'
+  ##### $1: 'vasper_relax'
+  ##### $1: 'vasper_alm'
+  ##### $1: 'disp_fc2' $2: dimension(ex. "3 3 3" )
+  source $MODULE_DIR/conf.zsh
+  file_does_not_exist_check "${1}.conf"
+  if [ "$1" = "vasper_relax" ]; then
+    argnum_check "1" "$#"
+    cp $TEMPLATE_DIR/${1}.conf ./${1}.conf
+  elif [ "$1" = "vasper_fc2" ]; then
+    argnum_check "1" "$#"
+    cp $TEMPLATE_DIR/${1}.conf ./${1}.conf
+  elif [ "$1" = "vasper_alm" ]; then
+    argnum_check "1" "$#"
+    cp $TEMPLATE_DIR/${1}.conf ./${1}.conf
+  elif [ "$1" = "disp_fc2" ]; then
+    argnum_check "2" "$#"
+    disp_conf "fc2" "$2"
+  elif [ "$1" = "disp_alm" ]; then
+    argnum_check "4" "$#"
+    disp_conf "alm" "$2" "$3" "$4"
+  else
+    unexpected_args $1
+  fi
   exit 0
 fi
 
@@ -122,6 +173,15 @@ if [[ -n "${opthash[(i)--incar_band]}" ]]; then
   argnum_check "1" "$#"
   file_exists_check "$1"
   mk_incar_band "$1"
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--incar_born]}" ]]; then
+  ##### $1: INCAR file used in relax
+  source $MODULE_DIR/incar.zsh
+  argnum_check "1" "$#"
+  file_exists_check "$1"
+  mk_incar_born "$1"
   exit 0
 fi
 
@@ -179,11 +239,21 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
     job_header $2 >> "job_relax.sh"
     echo "" >> "job_relax.sh"
     vasprun_command >> "job_relax.sh"
+  elif [ "$1" = "alm" ]; then
+    touch "job_alm.sh"
+    job_header $2 >> "job_alm.sh"
+    echo "" >> "job_alm.sh"
+    vasprun_command >> "job_alm.sh"
   elif [ "$1" = "band" ]; then
     touch "job_band.sh"
     job_header $2 >> "job_band.sh"
     echo "" >> "job_band.sh"
     static_calc >> "job_band.sh"
+  elif [ "$1" = "born" ]; then
+    touch "job_born.sh"
+    job_header $2 >> "job_born.sh"
+    echo "" >> "job_born.sh"
+    vasprun_command >> "job_born.sh"
   elif [ "$1" = "dos" ]; then
     touch "job_dos.sh"
     job_header $2 >> "job_dos.sh"
@@ -202,8 +272,6 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
     echo "" >> "job_lobster.sh"
     lobster_command >> "job_lobster.sh"
   else
-    echo "$1 $2"
-    echo "hogehoge"
     unexpected_args "$1"
   fi
   exit 0

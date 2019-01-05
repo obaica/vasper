@@ -20,7 +20,8 @@ function mk_incar_relax()
   rm $tmpfile
   if [[ "$2" = "PBEsol" ]]; then
     echo "GGA = PS" >> INCAR
-  fi }
+  fi
+}
 
 function revise_encut()
 {
@@ -39,19 +40,17 @@ function remove_incar_setting()
 {
   ##### $1: incar file
   ##### $2: param name
-  if [ `cat $1 | grep "$2 = "` = "" ]; then
+  if [ "`cat $1 | grep "$2 ="`" = "" ]; then
     echo "param : $2 does not exist in $1"
     echo "exit(251)"
     exit 251
   else
-    echo "remove `grep $2 = $1`"
+    echo "remove param $2"
     tmpfile=$(mktemp)
     grep -v "$2 = " "$1" >> $tmpfile
     rm -f $1
     mv $tmpfile $1
-    echo ""
     echo "~~ removed $1 ~~"
-    cat $1
   fi
 }
 
@@ -107,6 +106,18 @@ function mk_incar_dos()
   echo "# ICHARG = 11" >> $1
 }
 
+function mk_incar_born()
+{
+  ##### $1: INCAR used in relax
+  revise_incar_param $1 "IBRION" "-1"
+  revise_incar_param $1 "NSW" "0"
+  revise_incar_param $1 "ISMEAR" "0"
+  remove_incar_setting $1 "EDIFFG"
+  remove_incar_setting $1 "ISIF"
+  remove_incar_setting $1 "NPAR"
+  make_new_incar_line_when_not_found $1 "LEPSILON" ".TRUE."
+}
+
 function mk_incar_fc2()
 {
   ##### $1: INCAR used in relax
@@ -140,4 +151,3 @@ function mk_incar_lobster()
   make_new_incar_line_when_not_found $1 "ISYM" "-1"
   echo "# ICHARG = 11" >> $1
 }
-
