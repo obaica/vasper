@@ -14,9 +14,14 @@ function make_disp_files()
   elif [ "$1" = "fc3" ]; then
     phono3py $2
   elif [ "$1" = "alm" ]; then
-    # PHONOPY_DIR=`cat $PROFILE | grep "PHONOPY_DIR" | sed s/"PHONOPY_DIR = "/""/g`
-    # phonaly-alm.py --phonopy_path="$PHONOPY_DIR" --dim=$2 --num=$3 --temperature=$4
-    phonaly-alm.py -d --dim=$2 --num=$3 --temperature=$4
+    DIM="`cat disp_alm.conf | grep DIM | sed s/"DIM = "/""/g`"
+    TEMP="`cat disp_alm.conf | grep TEMPERATURE | sed s/"TEMPERATURE = "/""/g`"
+    DISP_NUM="`cat disp_alm.conf | grep DISP_NUM | sed s/"DISP_NUM = "/""/g`"
+    FORCE_SETS="`cat disp_alm.conf | grep FORCE_SETS | sed s/"FORCE_SETS = "/""/g`"
+    source /home/mizokami-ubuntu/.pyenv/versions/anaconda3-5.3.1/etc/profile.d/conda.sh
+    conda activate $ALM_ENV
+    $MODULE_DIR/alm-phonopy.py -d --dim=$DIM --temperature=$TEMP --num=$DISP_NUM --fs=$FORCE_SETS
+    conda deactivate
   else
     {
       echo "you specified '$1' = $1"
@@ -60,7 +65,18 @@ function make_disp_dirs()
     cp -r POTCAR disp-${num}/POTCAR
     cp -r KPOINTS disp-${num}/KPOINTS
     cp -r INCAR disp-${num}/INCAR
-    cat job_${1}.sh | sed s/"fc2"/"fc2_${num}"/g > disp-${num}/job_fc2.sh
+    cat job_${1}.sh | sed s/"${1}"/"${1}_${num}"/g > disp-${num}/job_${1}.sh
     mv $i disp-${num}/POSCAR
   done
+}
+
+### get dirname for creating alm calculation
+function get_alm_dirname()
+{
+  COUNT=1
+  while [ -e "calc${COUNT}" ]
+  do
+    COUNT=`expr $COUNT + 1`
+  done
+  echo calc${COUNT}
 }

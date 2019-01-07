@@ -91,6 +91,8 @@ function mk_incar_band()
   revise_incar_param $1 "IBRION" "-1"
   revise_incar_param $1 "NSW" "0"
   revise_incar_param $1 "ISMEAR" "0"
+  remove_incar_setting $1 "EDIFFG"
+  remove_incar_setting $1 "ISIF"
   revise_incar_param $1 "LCHARG" ".TRUE."
   echo "# ICHARG = 11" >> $1
 }
@@ -101,6 +103,8 @@ function mk_incar_dos()
   revise_incar_param $1 "IBRION" "-1"
   revise_incar_param $1 "NSW" "0"
   revise_incar_param $1 "ISMEAR" "-5"
+  remove_incar_setting $1 "EDIFFG"
+  remove_incar_setting $1 "ISIF"
   revise_incar_param $1 "LCHARG" ".TRUE."
   make_new_incar_line_when_not_found $1 "LORBIT" "11"
   echo "# ICHARG = 11" >> $1
@@ -123,6 +127,8 @@ function mk_incar_fc2()
   ##### $1: INCAR used in relax
   revise_incar_param $1 "IBRION" "-1"
   revise_incar_param $1 "NSW" "0"
+  remove_incar_setting $1 "EDIFFG"
+  remove_incar_setting $1 "ISIF"
 }
 
 function mk_incar_lobster()
@@ -146,6 +152,8 @@ function mk_incar_lobster()
   revise_incar_param $1 "ISMEAR" "0"
   revise_incar_param $1 "LCHARG" ".TRUE."
   revise_incar_param $1 "LWAVE" ".TRUE."
+  remove_incar_setting $1 "EDIFFG"
+  remove_incar_setting $1 "ISIF"
   make_new_incar_line_when_not_found $1 "NBANDS" "$NBANDS"
   make_new_incar_line_when_not_found $1 "LORBIT" "11"
   make_new_incar_line_when_not_found $1 "ISYM" "-1"

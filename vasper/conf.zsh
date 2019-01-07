@@ -22,11 +22,13 @@ function disp_conf()
   ##### $2: dim ex. "3 3 3"
   ##### $3: 'alm' => temperature
   ##### $4: 'alm' => the number of displacement
+  ##### $5: 'alm' => FORCE_SETS file path
   if [ "$1" = "alm" ]; then
     {
       echo "DIM = $2"
       echo "TEMPERATURE = $3"
       echo "DISP_NUM = $4"
+      echo "FORCE_SETS = $5"
     } > disp_${1}.conf
   elif [ "$1" = "fc2" -o "$1" = "fc3" ]; then
     {

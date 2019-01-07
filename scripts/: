@@ -95,7 +95,6 @@ if [[ -n "${opthash[(i)--alm]}" ]]; then
   cp $P_FC2_DIRNAME/POTCAR $P_FC2_DIRNAME/INCAR $P_FC2_DIRNAME/KPOINTS $P_DIRNAME
   echo "copying $P_BORN_DIRNAME/BORN and $P_FC2_DIRNAME/FORCE_SETS to $P_DIRNAME/calc0"
   cp $P_BORN_DIRNAME/BORN $P_DIRNAME
-  mkdir $P_DIRNAME/calc0
   cp $P_FC2_DIRNAME/FORCE_SETS $P_DIRNAME/calc0
   DIM="`cat ${P_FC2_DIRNAME}/disp_fc2.conf | grep DIM | sed s/"DIM = "/""/g`"
   cd $P_DIRNAME
@@ -105,7 +104,7 @@ if [[ -n "${opthash[(i)--alm]}" ]]; then
   echo "making job_alm.sh"
   vasper-makefile.zsh --job "alm" "$JOBNAME"
   echo "making disp_alm.conf"
-  vasper-makefile.zsh --get_conf "disp_alm" "$DIM" "$P_TEMP" "$P_DISP_NUM" "calc0/FORCE_SETS"
+  vasper-makefile.zsh --get_conf "disp_alm" "$DIM" "$P_TEMP" "$P_DISP_NUM"
   echo "made"
   exit 0
 fi
@@ -174,8 +173,6 @@ if [[ -n "${opthash[(i)--disp]}" ]]; then
     make_disp_dirs "alm"
     DISP_DIRNAME=`get_alm_dirname`
     mkdir $DISP_DIRNAME
-    FS_PATH="`cat disp_alm.conf | grep FORCE_SETS | sed s/"FORCE_SETS = "/""/g`"
-    echo "FORCE_SETS file path : `pwd`/$FS_PATH" > "$DISP_DIRNAME/vasper.log"
     mv disp-0* $DISP_DIRNAME
   else
     echo "$1 is not supported"

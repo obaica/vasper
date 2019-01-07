@@ -1,5 +1,5 @@
 # local environment is set with this file
-### Please revise this file and set $HOME/.vasperrc
+### Please revise this file and place to $HOME/.vasperrc
 
 ### mpirun command
 MPIRUN="/path/to/mpirun"
@@ -11,6 +11,8 @@ LOBSTER="/path/to/lobster"
 ### POTCAR Database
 POT_DIR="/path/to/potcardb_directory"
 
+### ALM activate command
+ALM_ENV="alm_env_name"
 
 # You must not revise the environment variables below
 VASPER_DIR=$(dirname  $(dirname `which vasper-makefile.zsh`))

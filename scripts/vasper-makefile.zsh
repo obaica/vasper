@@ -144,6 +144,7 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   ##### $1: 'vasper_relax'
   ##### $1: 'vasper_alm'
   ##### $1: 'disp_fc2' $2: dimension(ex. "3 3 3" )
+  ##### $1: 'disp_conf' $2: dimension(ex. "3 3 3" ) $3: temperature $4: sampling num $5 : FORCE_SETS file path
   source $MODULE_DIR/conf.zsh
   file_does_not_exist_check "${1}.conf"
   if [ "$1" = "vasper_relax" ]; then
@@ -159,8 +160,8 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
     argnum_check "2" "$#"
     disp_conf "fc2" "$2"
   elif [ "$1" = "disp_alm" ]; then
-    argnum_check "4" "$#"
-    disp_conf "alm" "$2" "$3" "$4"
+    argnum_check "5" "$#"
+    disp_conf "alm" "$2" "$3" "$4" "$5"
   else
     unexpected_args $1
   fi
