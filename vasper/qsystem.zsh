@@ -10,7 +10,7 @@ function disp_qsub()
   if [ -e "vasper_job.log" ]; then
     rm -f "vasper_job.log"
   fi
-  echo "job-id dirname state" > "vasper_job.log"
+  echo "job-id dirname" > "vasper_job.log"
   for i in disp-*
   do
     cd $i
