@@ -9,6 +9,7 @@ function make_disp_files()
 {
   ##### $1: 'fc2' or 'fc3' or 'alm'
   ##### $2: conf file
+  ##### $3: FORCE_SETS file path
   if [ "$1" = "fc2" ]; then
     phonopy $2
   elif [ "$1" = "fc3" ]; then
@@ -17,7 +18,7 @@ function make_disp_files()
     DIM="`cat disp_alm.conf | grep DIM | sed s/"DIM = "/""/g`"
     TEMP="`cat disp_alm.conf | grep TEMPERATURE | sed s/"TEMPERATURE = "/""/g`"
     DISP_NUM="`cat disp_alm.conf | grep DISP_NUM | sed s/"DISP_NUM = "/""/g`"
-    FORCE_SETS="`cat disp_alm.conf | grep FORCE_SETS | sed s/"FORCE_SETS = "/""/g`"
+    FORCE_SETS="$3"
     source /home/mizokami-ubuntu/.pyenv/versions/anaconda3-5.3.1/etc/profile.d/conda.sh
     conda activate $ALM_ENV
     $MODULE_DIR/alm-phonopy.py -d --dim=$DIM --temperature=$TEMP --num=$DISP_NUM --fs=$FORCE_SETS
@@ -73,10 +74,18 @@ function make_disp_dirs()
 ### get dirname for creating alm calculation
 function get_alm_dirname()
 {
+  ##### $1 : 'next' or 'last'
   COUNT=1
   while [ -e "calc${COUNT}" ]
   do
     COUNT=`expr $COUNT + 1`
   done
-  echo calc${COUNT}
+  if [ "$1" = "next" ]; then
+    echo calc${COUNT}
+  elif [ "$1" = "last" ]; then
+    # COUNT=`expr $COUNT - 1`
+    echo calc$((${COUNT}-1))
+  else
+    unexpected_args "$1"
+  fi
 }

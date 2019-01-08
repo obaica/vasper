@@ -61,3 +61,12 @@ function unexpected_args()
   echo "exit(251)"
   exit 251
 }
+
+### uncorrect directory:
+function uncorrect_directory()
+{
+  ##### $1: dirname
+  echo "uncorrect directory : $1"
+  echo "exit(250)"
+  exit 250
+}

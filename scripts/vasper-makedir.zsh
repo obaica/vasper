@@ -105,7 +105,7 @@ if [[ -n "${opthash[(i)--alm]}" ]]; then
   echo "making job_alm.sh"
   vasper-makefile.zsh --job "alm" "$JOBNAME"
   echo "making disp_alm.conf"
-  vasper-makefile.zsh --get_conf "disp_alm" "$DIM" "$P_TEMP" "$P_DISP_NUM" "calc0/FORCE_SETS"
+  vasper-makefile.zsh --get_conf "disp_alm" "$DIM" "$P_TEMP" "$P_DISP_NUM"
   echo "made"
   exit 0
 fi
@@ -169,14 +169,16 @@ if [[ -n "${opthash[(i)--disp]}" ]]; then
     make_disp_files "fc2" "$1"
     make_disp_dirs "fc2"
   elif [ "$1" = "disp_alm.conf" ]; then
+    DISP_DIRNAME=`get_alm_dirname "next"`
+    echo "DISP_DIRNAME : $DISP_DIRNAME"
+    FS_PATH=`get_alm_dirname "last"`/FORCE_SETS
+    file_exists_check $FS_PATH
     file_does_not_exist_check "disp-001"
-    make_disp_files "alm" "$1"
+    make_disp_files "alm" "$1" "$FS_PATH"
     make_disp_dirs "alm"
-    DISP_DIRNAME=`get_alm_dirname`
     mkdir $DISP_DIRNAME
-    FS_PATH="`cat disp_alm.conf | grep FORCE_SETS | sed s/"FORCE_SETS = "/""/g`"
-    echo "FORCE_SETS file path : `pwd`/$FS_PATH" > "$DISP_DIRNAME/vasper.log"
     mv disp-0* $DISP_DIRNAME
+    echo "FORCE_SETS file path : `pwd`/$FS_PATH" > "$DISP_DIRNAME/vasper.log"
   else
     echo "$1 is not supported"
     unexpected_args
@@ -282,8 +284,8 @@ if [[ -n "${opthash[(i)--raw_data]}" ]]; then
   cd raw_data
   phonopy --symmetry -c="$1" --tolerance="$2"
   touch "vasper.log"
-  echo "# phonopy symmetry" | tee "vasper.log"
-  echo "phonopy --symmetry -c=$1 --tolerance=$2" | tee "vasper.log"
+  echo "# phonopy symmetry" | tee -a "vasper.log"
+  echo "phonopy --symmetry -c=$1 --tolerance=$2" | tee -a "vasper.log"
   cd -
   exit 0
 fi

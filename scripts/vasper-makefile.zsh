@@ -17,6 +17,9 @@ function usage()
     --disp_file    make displaced files
         \$1: conf file
 
+    --force_sets    make FORCE_SETS file
+        \$1: 'alm'
+
     --get_conf      make conf file
         \$1: 'vasper_fc2'
         \$1: 'vasper_relax'
@@ -111,13 +114,15 @@ source $MODULE_DIR/error-codes.zsh
 local -A opthash
 zparseopts -D -A opthash -- h \
            -get_conf \
+           -force_sets \
            -incar_band \
            -incar_born \
            -incar_dos \
            -incar_fc2 \
            -incar_lobster \
            -incar_relax \
-           -job -kpoints \
+           -job \
+           -kpoints \
            -kpoints_newmesh \
            -kpoints_multi \
            -lobsterin \
@@ -139,12 +144,24 @@ if [[ -n "${opthash[(i)--disp]}" ]]; then
   exit 0
 fi
 
+if [[ -n "${opthash[(i)--force_sets]}" ]]; then
+  ##### $1: 'alm'
+  if [ "$1" = "alm" ]; then
+    conda activate $ALM_ENV
+    $MODULE_DIR/alm-phonopy.py -f --vasprun="`echo disp-*/vasprun.xml`"
+    conda deactivate
+  else
+    unexpected_args "$1"
+  fi
+  exit 0
+fi
+
 if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   ##### $1: 'vasper_fc2'
   ##### $1: 'vasper_relax'
   ##### $1: 'vasper_alm'
   ##### $1: 'disp_fc2' $2: dimension(ex. "3 3 3" )
-  ##### $1: 'disp_conf' $2: dimension(ex. "3 3 3" ) $3: temperature $4: sampling num $5 : FORCE_SETS file path
+  ##### $1: 'disp_conf' $2: dimension(ex. "3 3 3" ) $3: temperature $4: sampling num
   source $MODULE_DIR/conf.zsh
   file_does_not_exist_check "${1}.conf"
   if [ "$1" = "vasper_relax" ]; then
@@ -160,8 +177,8 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
     argnum_check "2" "$#"
     disp_conf "fc2" "$2"
   elif [ "$1" = "disp_alm" ]; then
-    argnum_check "5" "$#"
-    disp_conf "alm" "$2" "$3" "$4" "$5"
+    argnum_check "4" "$#"
+    disp_conf "alm" "$2" "$3" "$4"
   else
     unexpected_args $1
   fi
