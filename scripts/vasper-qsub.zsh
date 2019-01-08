@@ -39,7 +39,7 @@ source $MODULE_DIR/error-codes.zsh
 ### zparseopts
 local -A opthash
 zparseopts -D -A opthash -- h \
-           -get_conf \
+           -disp \
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
