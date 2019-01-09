@@ -17,6 +17,7 @@ BASE_DIR=`pwd`
 PHONOPY_DIR=$BASE_DIR/phonopy
 
 ### read alm_auto.conf
+QUE=`cat "$1" | grep "QUE = " | sed s/"QUE = "/""/g`
 MESH=`cat "$1" | grep "MESH = " | sed s/"MESH = "/""/g`
 SLEEP_MINITES=`cat "$1" | grep "SLEEP_MINITES = " | sed s/"SLEEP_MINITES = "/""/g`
 LOOP_NUM=`cat "$1" | grep "LOOP_NUM = " | sed s/"LOOP_NUM = "/""/g`
@@ -63,7 +64,8 @@ function check_convergence()
   echo "calc${1} $D_FREC" >> "alm_convergence.log"
   cd $BASE_DIR
 
-  if [ "$D_FREC" -lt "$THRESHOLD" ]; then
+  CONV=`echo "$D_FREC < $THRESHOLD" | bc`
+  if [ "$CONV" = "1" ]; then
     echo "converged"
     return 0
   else
@@ -82,14 +84,18 @@ if [ ! -e $PHONOPY_DIR ]; then
 fi
 
 ### alm calculation
-for NUM in $LOOP_NUM
+for NUM in {1..$LOOP_NUM}
 do
+  echo "-----------"
+  echo "loop : $NUM"
+  echo "-----------"
+  echo ""
   ### make displacements and qsub
   vasper-makedir.zsh --disp "disp_alm.conf"
   CALC_DIR=$BASE_DIR/`ls | grep calc | sort | tail -n 1`
   CALC_DIR_NUM=`basename "$CALC_DIR" | sed -e 's/[^0-9]//g'`
   cd $CALC_DIR
-  vasper-qsub.zsh --disp "alm"
+  vasper-qsub.zsh --disp "alm" "$QUE"
   JOB_IDS=(`tail -n +2 "vasper_job.log" | cut -d " " -f 1`)
 
   ### check whethere jobs finish
