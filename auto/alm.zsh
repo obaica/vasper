@@ -3,7 +3,7 @@
 ##### $1 : alm_auto.conf file
 
 ### source
-source $MODULE_DIR/vasper/qsystem.zsh
+source $MODULE_DIR/qsystem.zsh
 
 ### dirnames
 BASE_DIR=`pwd`
