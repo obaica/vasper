@@ -3,6 +3,7 @@
 ##### $1 : alm_auto.conf file
 
 ### source
+source $HOME/.vasperrc
 source $MODULE_DIR/qsystem.zsh
 
 ### dirnames
