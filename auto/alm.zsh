@@ -63,7 +63,7 @@ function check_convergence()
   echo "calc${1} $D_FREC" >> "alm_convergence.log"
   cd $BASE_DIR
 
-  if [ "D_FREC" -lt "THRESHOLD" ]; then
+  if [ "$D_FREC" -lt "$THRESHOLD" ]; then
     echo "converged"
     return 0
   else
