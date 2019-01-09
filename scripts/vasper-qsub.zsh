@@ -16,6 +16,7 @@ function usage()
 
     --disp         make displaced files
         \$1: 'alm'
+        \$2: que name (option) ex. "vega-e"
   Exit:
     0   : normal
     1   : unexpected error
@@ -49,6 +50,7 @@ fi
 
 if [[ -n "${opthash[(i)--disp]}" ]]; then
   ##### $1: 'alm'
+  ##### $2: que name (option) ex. "vega-e"
   source $MODULE_DIR/qsystem.zsh
   if [ "`ls | grep disp-0 | wc -l`" = "0" ]; then
     echo "could not find any disp-**** directory"
@@ -56,7 +58,7 @@ if [[ -n "${opthash[(i)--disp]}" ]]; then
   fi
 
   if [ "$1" = "alm" ]; then
-    disp_qsub "job_alm.sh"
+    disp_qsub "job_alm.sh" "$2"
   else
     unexpected_args "$1"
   fi

@@ -87,6 +87,7 @@ do
   ### make displacements and qsub
   vasper-makedir.zsh --disp "disp_alm.conf"
   CALC_DIR=$BASE_DIR/`ls | grep calc | sort | tail -n 1`
+  CALC_DIR_NUM=`basename "$CALC_DIR" | sed -e 's/[^0-9]//g'`
   cd $CALC_DIR
   vasper-qsub.zsh --disp "alm"
   JOB_IDS=(`tail -n +2 "vasper_job.log" | cut -d " " -f 1`)
@@ -102,7 +103,6 @@ do
   ### post process
   vasper-makefile.zsh --force_sets "alm"
   cp FORCE_SETS $PHONOPY_DIR
-  CALC_DIR_NUM=`echo "$CALC_DIR" | sed -e 's/[^0-9]//g'`
   phonopy_working $CALC_DIR_NUM
   check_convergence $CALC_DIR_NUM
   if [ "$?" = 0 ]; then

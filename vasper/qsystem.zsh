@@ -4,9 +4,24 @@
 # functions for making various qsystem style
 ###############################################################################
 
+function execute_qsub()
+{
+  ##### $2 : job file
+  ##### $1 : que name
+  ##### if $2 is not specified qsub normally
+  ##### else qsub -q $1
+  if [ "$1" = "" ]; then
+    qsub "$2"
+  else
+    qsub -q "$1" "$2"
+  fi
+}
+
+
 function disp_qsub()
 {
   ##### $1 : job file name
+  ##### $1 : que name
   if [ -e "vasper_job.log" ]; then
     rm -f "vasper_job.log"
   fi
