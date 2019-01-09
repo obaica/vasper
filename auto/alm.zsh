@@ -17,8 +17,8 @@ BASE_DIR=`pwd`
 PHONOPY_DIR=$BASE_DIR/phonopy
 
 ### read alm_auto.conf
-MESH=`cat "$1" | sed s/"MESH = "/""/g`
-SLEEP_MINITES=`cat "$1" | sed s/"SLEEP_MINITES = "/""/g`
+MESH=`cat "$1" | grep "MESH = " | sed s/"MESH = "/""/g`
+SLEEP_MINITES=`cat "$1" | grep "SLEEP_MINITES = " | sed s/"SLEEP_MINITES = "/""/g`
 MESH_NO_SPACE=`echo "$MESH" | sed s/" "/""/g`
 DOS_CONF=dos-m${MESH_NO_SPACE}.conf
 
@@ -63,7 +63,7 @@ JOB_IDS=(`tail -n +2 "vasper_job.log" | cut -d " " -f 1`)
 
 while ! `check_finish`
 do
-  sleep $SLEEP_MINITES
+  sleep $(($SLEEP_MINITES*60))
   date
 done
 
