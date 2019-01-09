@@ -53,7 +53,7 @@ if [[ -n "${opthash[(i)--alm]}" ]]; then
   if [ ! -e "calc0" ]; then
     uncorrect_directory `pwd`
   fi
-  $MODULE_DIR/auto/alm.zsh "$1"
+  $VASPER_DIR/auto/alm.zsh "$1"
   exit 0
 fi
 
