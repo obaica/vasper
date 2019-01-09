@@ -63,7 +63,6 @@ if args.make_disp:
     # Temperature [K]
     # Random seed
     dim = list(map(int, args.dim.split()))
-    print(args.fs)
     phonon = phonopy.load(supercell_matrix=dim,
                           born_filename="BORN",
                           unitcell_filename="POSCAR-unitcell",

@@ -56,6 +56,7 @@ function usage()
     253 : The file you tried to make already exists.
     252 : The file which needs to process does not exist.
     251 : Unexpected argments were parsed.
+    250 : You tried to run in the uncorrect directory.
 
 EOF
 }

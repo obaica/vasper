@@ -20,9 +20,9 @@ function make_disp_files()
     DISP_NUM="`cat disp_alm.conf | grep DISP_NUM | sed s/"DISP_NUM = "/""/g`"
     FORCE_SETS="$3"
     # source /home/mizokami-ubuntu/.pyenv/versions/anaconda3-5.3.1/etc/profile.d/conda.sh
-    conda activate $ALM_ENV
+    # conda activate $ALM_ENV
     $MODULE_DIR/alm-phonopy.py -d --dim=$DIM --temperature=$TEMP --num=$DISP_NUM --fs=$FORCE_SETS
-    conda deactivate
+    # conda deactivate
   else
     {
       echo "you specified '$1' = $1"

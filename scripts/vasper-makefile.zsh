@@ -26,6 +26,7 @@ function usage()
         \$1: 'vasper_alm'
         \$1: 'disp_fc2' \$2: dimension(ex. "3 3 3" )
         \$1: 'disp_alm' \$2: dimension(ex. "3 3 3" ) \$3: temperature \$4: the number of displacements
+        \$1: 'dos' \$2: disp.conf file \$3: mesh
 
     --incar_relax   make INCAR for relax
         if ENCUT is less than 10, automatically read 'POTCAR' for extructing ENMAX and ENCUT=ENMAX*ENCUT
@@ -147,9 +148,9 @@ fi
 if [[ -n "${opthash[(i)--force_sets]}" ]]; then
   ##### $1: 'alm'
   if [ "$1" = "alm" ]; then
-    conda activate $ALM_ENV
+    # conda activate $ALM_ENV
     $MODULE_DIR/alm-phonopy.py -f --vasprun="`echo disp-*/vasprun.xml`"
-    conda deactivate
+    # conda deactivate
   else
     unexpected_args "$1"
   fi
@@ -162,6 +163,7 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   ##### $1: 'vasper_alm'
   ##### $1: 'disp_fc2' $2: dimension(ex. "3 3 3" )
   ##### $1: 'disp_conf' $2: dimension(ex. "3 3 3" ) $3: temperature $4: sampling num
+  ##### $1: 'dos' $2: disp.conf file $3: mesh
   source $MODULE_DIR/conf.zsh
   file_does_not_exist_check "${1}.conf"
   if [ "$1" = "vasper_relax" ]; then
@@ -179,6 +181,9 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   elif [ "$1" = "disp_alm" ]; then
     argnum_check "4" "$#"
     disp_conf "alm" "$2" "$3" "$4"
+  elif [ "$1" = "dos" ]; then
+    argnum_check "3" "$#"
+    dos_pdos_conf "$1" "$2" "$3"
   else
     unexpected_args $1
   fi

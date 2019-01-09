@@ -40,3 +40,7 @@ function disp_qsub()
 #   mv $tmpfile $1
 # }
 
+function revised_qstat()
+{
+  qstat | tail -n +3 | sed -E 's/[\t ]+/ /g' | sed s/"^ "/""/g
+}
