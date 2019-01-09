@@ -6,12 +6,12 @@
 
 function execute_qsub()
 {
-  ##### $2 : job file
-  ##### $1 : que name
+  ##### $1 : job file
+  ##### $2 : que name
   ##### if $2 is not specified qsub normally
   ##### else qsub -q $1
-  if [ "$1" = "" ]; then
-    qsub "$2"
+  if [ "$2" = "" ]; then
+    qsub "$1"
   else
     qsub -q "$1" "$2"
   fi
@@ -21,7 +21,7 @@ function execute_qsub()
 function disp_qsub()
 {
   ##### $1 : job file name
-  ##### $1 : que name
+  ##### $2 : que name
   if [ -e "vasper_job.log" ]; then
     rm -f "vasper_job.log"
   fi
@@ -30,7 +30,7 @@ function disp_qsub()
   do
     cd $i
     DIRNAME=`basename $(pwd)`
-    COMMENT=`qsub $1`
+    COMMENT=`execute_qsub "$1" "$2"`
     JOB_ID=`echo $COMMENT | cut -d " " -f 3`
     echo "$COMMENT"
     echo "$JOB_ID $DIRNAME" >> "../vasper_job.log"
