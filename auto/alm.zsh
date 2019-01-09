@@ -102,8 +102,8 @@ do
   ### post process
   vasper-makefile.zsh --force_sets "alm"
   cp FORCE_SETS $PHONOPY_DIR
-  phonopy_working
   CALC_DIR_NUM=`echo "$CALC_DIR" | sed -e 's/[^0-9]//g'`
+  phonopy_working $CALC_DIR_NUM
   check_convergence $CALC_DIR_NUM
   if [ "$?" = 0 ]; then
     exit 0
