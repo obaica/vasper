@@ -24,6 +24,7 @@ function usage()
         \$1: 'vasper_fc2'
         \$1: 'vasper_relax'
         \$1: 'vasper_alm'
+        \$1: 'vasper_alm_auto'
         \$1: 'disp_fc2' \$2: dimension(ex. "3 3 3" )
         \$1: 'disp_alm' \$2: dimension(ex. "3 3 3" ) \$3: temperature \$4: the number of displacements
         \$1: 'dos' \$2: disp.conf file \$3: mesh
@@ -161,6 +162,7 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   ##### $1: 'vasper_fc2'
   ##### $1: 'vasper_relax'
   ##### $1: 'vasper_alm'
+  ##### $1: 'vasper_alm_auto'
   ##### $1: 'disp_fc2' $2: dimension(ex. "3 3 3" )
   ##### $1: 'disp_conf' $2: dimension(ex. "3 3 3" ) $3: temperature $4: sampling num
   ##### $1: 'dos' $2: disp.conf file $3: mesh
@@ -173,6 +175,9 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
     argnum_check "1" "$#"
     cp $TEMPLATE_DIR/${1}.conf ./${1}.conf
   elif [ "$1" = "vasper_alm" ]; then
+    argnum_check "1" "$#"
+    cp $TEMPLATE_DIR/${1}.conf ./${1}.conf
+  elif [ "$1" = "vasper_alm_auto" ]; then
     argnum_check "1" "$#"
     cp $TEMPLATE_DIR/${1}.conf ./${1}.conf
   elif [ "$1" = "disp_fc2" ]; then

@@ -15,7 +15,7 @@ function usage()
     -h evoke function usage
 
     --alm      run ALM calculation automatically
-        \$1: alm_auto.conf file
+        \$1: vasper_alm_auto.conf file
 
   Exit:
     0   : normal

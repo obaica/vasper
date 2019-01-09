@@ -59,9 +59,9 @@ function check_convergence()
   OUTPUT=`$MODULE_DIR/alm-phonopy.py -bd --mesh1="$MESH1" --mesh2="$MESH2"`
   D_FREC=`echo $OUTPUT | grep "average frequency difference" | rev | cut -d " " -f 1 | rev`
   if [ ! -e "alm_convergence.log" ]; then
-    echo "calc average_difference_from_previous_step(THz)" > "alm_convergence.log"
+    echo "calc loop_num average_difference_from_previous_step(THz)" > "alm_convergence.log"
   fi
-  echo "calc${1} $D_FREC" >> "alm_convergence.log"
+  echo "calc${1} ${1} $D_FREC" >> "alm_convergence.log"
   cd $BASE_DIR
 
   CONV=`echo "$D_FREC < $THRESHOLD" | bc`
@@ -84,8 +84,11 @@ if [ ! -e $PHONOPY_DIR ]; then
 fi
 
 ### alm calculation
+echo "start ALM calculation"
+echo "maximum loop : $LOOP_NUM"
 for NUM in {1..$LOOP_NUM}
 do
+  echo ""
   echo "-----------"
   echo "loop : $NUM"
   echo "-----------"
