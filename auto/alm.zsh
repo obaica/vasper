@@ -1,5 +1,7 @@
 #!/usr/bin/zsh
 
+set -e
+
 ##### $1 : alm_auto.conf file
 
 ### check
