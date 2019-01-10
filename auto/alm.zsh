@@ -31,7 +31,9 @@ function phonopy_working()
 {
   ##### $1 : number
   cd $PHONOPY_DIR
+  set -e
   phonopy $DOS_CONF --alm
+  set +e
   mkdir -p force_sets mesh
   mv mesh.hdf5 mesh/calc${1}_mesh.hdf5
   mv FORCE_SETS force_sets/calc${1}_FORCE_SETS
@@ -51,20 +53,19 @@ function get_status()
   fi
 }
 
-
 function check_finish()
 {
   ALL_JOBS=`revised_qstat | cut -d " " -f 1`
   for i in $JOB_IDS
   do
     STATUS=`get_status "$i"`
-    echo "$i $STATUS"
     revise_vasper_job_status "vasper_job.log" "$i" "$STATUS"
-    if `echo $ALL_JOBS | grep -q $i`; then
-      return 1
-    fi
-    done
+  done
+  if [ "`cat "vasper_job.log" | grep -v "finish" | wc -l`" = "1" ]; then
     return 0
+  else
+    return 1
+  fi
 }
 
 function check_convergence()
@@ -119,12 +120,18 @@ do
   JOB_IDS=(`tail -n +2 "vasper_job.log" | cut -d " " -f 1`)
 
   ### check whethere jobs finish
-  while ! `check_finish`
+  # while ! `check_finish`
+  while :
   do
-    sleep $(($SLEEP_MINITES*60))
-    echo "`date +"%Y/%m/%d/%I:%M:%S"` : jobs do not finish"
+    check_finish
+    if [ "$?" = "0" ]; then
+      echo "`date +"%Y/%m/%d/%I:%M:%S"` : all jobs finish !"
+      break
+    else
+      echo "`date +"%Y/%m/%d/%I:%M:%S"` : jobs do not finish"
+      sleep $(($SLEEP_MINITES*60))
+    fi
   done
-  echo "`date +"%Y/%m/%d/%I:%M:%S"` : all jobs finish !"
 
   ### post process
   vasper-makefile.zsh --force_sets "alm"
