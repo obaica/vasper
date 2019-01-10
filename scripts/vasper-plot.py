@@ -9,16 +9,44 @@
 import os
 import argparse
 from matplotlib import pyplot as plt
-from pymatgen.io import vasp as pmg_vasp
-from pymatgen.electronic_structure import plotter as pmg_plotter
+from pymatgen.io import lobster as pmglobster
+from pymatgen.io import vasp as pmgvasp
+from pymatgen.electronic_structure import plotter as pmgplotter
+
+def print_runmode():
+    print("----------------------")
+    print("run mode and filenames")
+    print("----------------------")
+    print("run mode : 'ele_band'                  filenames : 'vasprun.xml'")
+    print("run mode : 'ele_dos'                   filenames : 'vasprun.xml'")
+    print("run mode : 'ele_element_dos'           filenames : 'vasprun.xml'")
+    print("run mode : 'lobster_dos'               filenames : 'vasprun.xml' 'DOSCAR.lobster'")
+    print("run mode : 'lobster_element_dos'       filenames : 'vasprun.xml' 'DOSCAR.lobster'")
+    print("run mode : 'lobster_element_spd_dos'   filenames : 'vasprun.xml' 'DOSCAR.lobster'")
+    print("run mode : 'lobster_spd_dos'           filenames : 'vasprun.xml' 'DOSCAR.lobster'")
+    print("")
+    print("----------------------")
+    print("run mode and keys")
+    print("----------------------")
+    print("run mode : 'ele_band'                  keys : None")
+    print("run mode : 'ele_dos'                   keys : None")
+    print("run mode : 'ele_element_dos'           keys : None")
+    print("run mode : 'lobster_dos'               keys : None")
+    print("run mode : 'lobster_element_dos'       keys : None")
+    print("run mode : 'lobster_element_spd_dos'   keys : element")
+    print("run mode : 'lobster_spd_dos'           keys : None")
+    print("")
+
+
 
 ### Arg-parser
 parser = argparse.ArgumentParser(
     description="This script plots various figures")
-parser.add_argument('-vf', '--vasprun_file', type=str, default='vasprun.xml',
-                    help="input vasprun.xml file")
-parser.add_argument('-r', '--runmode', type=str,
-                    help="choose : 'dos' or 'pdos' or 'band'")
+parser.add_argument('-r', '--runmode', type=str, help=print_runmode())
+parser.add_argument('-f', '--filenames', type=str,
+                    help="input filenames")
+parser.add_argument('-k', '--keys', type=str, default=None,
+                    help="additional parse keys")
 parser.add_argument('--xlim', type=str, default='None None',
                     help="figure xlimit, don't use colon \
                           ex) '-10 20', 'None 20'")
@@ -27,60 +55,85 @@ parser.add_argument('--ylim', type=str, default='None None',
                           ex) '-10 20', 'None 20'")
 args = parser.parse_args()
 
-### file check
-def check_file_exist(filepath):
-    if not os.path.isfile(filepath):
-        ValueError("%s does not exist" % filepath)
-    else:
-        print("reading : %s" % filepath)
-
 ### analysis parser
-def shape_parser(parser):
+def reshape_parser(parser, objtype=str):
     """
     from 'None 3.5' to (None, 3.5)
-    retrun list object
     """
     split = parser.split()
     for i in range(len(split)):
         if split[i] == 'None':
             split[i] = None
         else:
-            split[i] = float(split[i])
+            split[i] = objtype(split[i])
     return tuple(split)
 
-### density of states
-def PlotDos(tdos, xlim, ylim):
-    plotter = pmg_plotter.DosPlotter()
-    plotter.add_dos("Total DOS", tdos)
-    plotter.show(xlim=xlim, ylim=ylim)
+### read data from file
+def read_data(runmode, filenames, keys=None):
+    """
+    read necessary data from file
+    """
+    if runmode == 'ele_dos':
+        vasprun = pmgvasp.outputs.Vasprun(filenames)
+        tdos = vasprun.tdos
+        return tdos
+    elif runmode == 'ele_element_dos':
+        vasprun = pmgvasp.outputs.Vasprun(filenames)
+        cdos = vasprun.complete_dos
+        element_dos = cdos.get_element_dos()
+        return element_dos
+    elif runmode == 'ele_band':
+        vasprun = pmgvasp.outputs.BSVasprun(filenames)
+        band = vasprun.get_band_structure(line_mode=True)
+        return band
+    elif runmode == 'lobster_dos':
+        filenames = reshape_parser(filenames)
+        doscar = pmglobster.Doscar(vasprun=filenames[0], doscar=filenames[1])
+        tdos = doscar.tdos
+        return tdos
+    elif runmode == 'lobster_element_dos':
+        filenames = reshape_parser(filenames)
+        doscar = pmglobster.Doscar(vasprun=filenames[0], doscar=filenames[1])
+        cdos = doscar.completedos
+        element_dos = cdos.get_element_dos()
+        return element_dos
+    elif runmode == 'lobster_element_spd_dos':
+        filenames = reshape_parser(filenames)
+        doscar = pmglobster.Doscar(vasprun=filenames[0], doscar=filenames[1])
+        cdos = doscar.completedos
+        element_dos = cdos.get_element_spd_dos(el=keys)
+        return element_dos
+    elif runmode == 'lobster_spd_dos':
+        filenames = reshape_parser(filenames)
+        doscar = pmglobster.Doscar(vasprun=filenames[0], doscar=filenames[1])
+        cdos = doscar.completedos
+        element_dos = cdos.get_spd_dos()
+        return element_dos
+    else:
+        raise ValueError("runmode : %s is not supported" % runmode)
 
-def PlotPdos(element_dos, xlim, ylim):
-    plotter = pmg_plotter.DosPlotter()
-    plotter.add_dos_dict(element_dos)
-    plotter.show(xlim=xlim, ylim=ylim)
+def make_plot(runmode, data, xlim, ylim):
+    """
+    plot
+    """
+    if runmode == 'ele_dos' or runmode == 'lobster_dos':
+        plotter = pmgplotter.DosPlotter()
+        plotter.add_dos("Total DOS", data)
+        plotter.show(xlim=xlim, ylim=ylim)
+    elif runmode == 'ele_element_dos' or \
+         runmode == 'lobster_element_dos' or \
+         runmode == 'lobster_element_spd_dos' or \
+         runmode == 'lobster_spd_dos':
+        plotter = pmgplotter.DosPlotter()
+        plotter.add_dos_dict(data)
+        plotter.show(xlim=xlim, ylim=ylim)
+    elif runmode == 'ele_band':
+        plotter = pmgplotter.BSPlotter(bandstr)
+        plotter.get_plot(ylim=ylim).show()
+    else:
+        raise ValueError("runmode : %s is not supported" % args.runmode)
 
-def PlotBand(bandstr, ylim):
-    plotter = pmg_plotter.BSPlotter(bandstr)
-    plotter.get_plot(ylim=ylim).show()
-
-check_file_exist(args.vasprun_file)
-if args.runmode == 'band':
-    vasprun = pmg_vasp.outputs.BSVasprun(args.vasprun_file)
-else:
-    vasprun = pmg_vasp.outputs.Vasprun(args.vasprun_file)
-
-xlim = shape_parser(args.xlim)
-ylim = shape_parser(args.ylim)
-
-if args.runmode == 'dos':
-    tdos = vasprun.tdos
-    PlotDos(tdos, xlim, ylim)
-
-if args.runmode == 'pdos':
-    cdos = vasprun.complete_dos
-    element_dos = cdos.get_element_dos()
-    PlotPdos(element_dos, xlim, ylim)
-
-if args.runmode == 'band':
-    bandstr = vasprun.get_band_structure(line_mode=True)
-    PlotBand(bandstr, ylim)
+xlim = reshape_parser(args.xlim, objtype=float)
+ylim = reshape_parser(args.ylim, objtype=float)
+data = read_data(args.runmode, args.filenames, args.keys)
+make_plot(args.runmode, data, xlim, ylim)
