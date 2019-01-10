@@ -40,11 +40,27 @@ function phonopy_working()
   cd $BASE_DIR
 }
 
+function get_status()
+{
+  ##### $1 : job id
+  STATUS=`check_status "$1"`
+  if [ "$STATUS" = "r" ]; then
+    echo "run"
+  elif [ "$STATUS" = "qw" ]; then
+    echo "wait"
+  else
+    echo "finish"
+  fi
+}
+
+
 function check_finish()
 {
   ALL_JOBS=`revised_qstat | cut -d " " -f 1`
   for i in $JOB_IDS
   do
+    STATUS=`get_status "$i"`
+    revise_vasper_job_status "vasper_job.log" "$i" "$STATUS"
     if `echo $ALL_JOBS | grep -q $i`; then
       return 1
     fi
@@ -115,7 +131,9 @@ do
   vasper-makefile.zsh --force_sets "alm"
   cp FORCE_SETS $PHONOPY_DIR
   phonopy_working $CALC_DIR_NUM
+  set +e
   check_convergence $CALC_DIR_NUM
+  set -e
   if [ "$?" = 0 ]; then
     exit 0
   fi

@@ -4,6 +4,11 @@
 # functions for making various qsystem style
 ###############################################################################
 
+function revised_qstat()
+{
+  qstat | tail -n +3 | sed -E 's/[\t ]+/ /g' | sed s/"^ "/""/g
+}
+
 function execute_qsub()
 {
   ##### $1 : job file
@@ -17,6 +22,12 @@ function execute_qsub()
   fi
 }
 
+function check_status()
+{
+  ##### $1 : job id
+  revised_qstat | grep "$1 " | cut -d " " -f 5
+}
+
 
 function disp_qsub()
 {
@@ -25,7 +36,7 @@ function disp_qsub()
   if [ -e "vasper_job.log" ]; then
     rm -f "vasper_job.log"
   fi
-  echo "job-id dirname" > "vasper_job.log"
+  echo "job-id dirname status" > "vasper_job.log"
   for i in disp-*
   do
     cd $i
@@ -33,10 +44,24 @@ function disp_qsub()
     COMMENT=`execute_qsub "$1" "$2"`
     JOB_ID=`echo $COMMENT | cut -d " " -f 3`
     echo "$COMMENT"
-    echo "$JOB_ID $DIRNAME" >> "../vasper_job.log"
+    echo "$JOB_ID $DIRNAME wait" >> "../vasper_job.log"
     cd -
   done
 }
+
+function revise_vasper_job_status()
+{
+  ##### $1 : vasper_job.log
+  ##### $2 : job id
+  ##### $3 : status
+  OLD_LINE=`cat "$1" | grep "$2"`
+  NEW_LINE=$(echo `cat "$1" | grep "$2" |  cut -d " " -f 1-2` "$3")
+  tmpfile=$(mktemp)
+  cat "$1" | sed s/"$OLD_LINE"/"$NEW_LINE"/g >> "$tmpfile"
+  rm -f "$1"
+  mv "$tmpfile" "$1"
+}
+
 
 # function add_at_specific_line()
 # {
@@ -54,8 +79,3 @@ function disp_qsub()
 #   rm -f $1
 #   mv $tmpfile $1
 # }
-
-function revised_qstat()
-{
-  qstat | tail -n +3 | sed -E 's/[\t ]+/ /g' | sed s/"^ "/""/g
-}
