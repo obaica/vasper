@@ -1,7 +1,5 @@
 #!/usr/bin/zsh
 
-set -e
-
 ##### $1 : alm_auto.conf file
 
 ### check
@@ -60,6 +58,7 @@ function check_finish()
   for i in $JOB_IDS
   do
     STATUS=`get_status "$i"`
+    echo "$i $STATUS"
     revise_vasper_job_status "vasper_job.log" "$i" "$STATUS"
     if `echo $ALL_JOBS | grep -q $i`; then
       return 1
@@ -123,7 +122,7 @@ do
   while ! `check_finish`
   do
     sleep $(($SLEEP_MINITES*60))
-    echo "`date +"%Y/%m/%d/%I:%M:%S"` : jobs do not finished"
+    echo "`date +"%Y/%m/%d/%I:%M:%S"` : jobs do not finish"
   done
   echo "`date +"%Y/%m/%d/%I:%M:%S"` : all jobs finish !"
 
@@ -131,9 +130,7 @@ do
   vasper-makefile.zsh --force_sets "alm"
   cp FORCE_SETS $PHONOPY_DIR
   phonopy_working $CALC_DIR_NUM
-  set +e
   check_convergence $CALC_DIR_NUM
-  set -e
   if [ "$?" = 0 ]; then
     exit 0
   fi
