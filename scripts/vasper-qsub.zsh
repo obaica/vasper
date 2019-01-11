@@ -59,7 +59,7 @@ if [[ -n "${opthash[(i)--disp]}" ]]; then
 
   if [ "$1" = "alm" ]; then
     disp_qsub "job_alm.sh" "$2"
-  if [ "$1" = "fc2" ]; then
+  elif [ "$1" = "fc2" ]; then
     disp_qsub "job_fc2.sh" "$2"
   else
     unexpected_args "$1"
