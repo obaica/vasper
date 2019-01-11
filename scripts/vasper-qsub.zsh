@@ -15,7 +15,7 @@ function usage()
     -h evoke function usage
 
     --disp         make displaced files
-        \$1: 'alm'
+        \$1: 'fc2' 'alm'
         \$2: que name (option) ex. "vega-e"
   Exit:
     0   : normal
@@ -49,7 +49,7 @@ if [[ -n "${opthash[(i)-h]}" ]]; then
 fi
 
 if [[ -n "${opthash[(i)--disp]}" ]]; then
-  ##### $1: 'alm'
+  ##### $1: 'fc2' 'alm'
   ##### $2: que name (option) ex. "vega-e"
   source $MODULE_DIR/qsystem.zsh
   if [ "`ls | grep disp-0 | wc -l`" = "0" ]; then
@@ -59,6 +59,8 @@ if [[ -n "${opthash[(i)--disp]}" ]]; then
 
   if [ "$1" = "alm" ]; then
     disp_qsub "job_alm.sh" "$2"
+  if [ "$1" = "fc2" ]; then
+    disp_qsub "job_fc2.sh" "$2"
   else
     unexpected_args "$1"
   fi
