@@ -11,13 +11,6 @@ LOBSTER="/path/to/lobster"
 ### POTCAR Database
 POT_DIR="/path/to/potcardb_directory"
 
-### ALM activate command
-ALM_ENV="alm_env_name"
-
-### VASPER scripts
-VASPER_SCRIPTS="/path/to/vasper/scripts"
-CRYSTAL_SCRIPTS="/path/to/crystal/scripts"
-
 # You must not revise the environment variables below
 VASPER_DIR=$(dirname  $(dirname `which vasper-makefile.zsh`))
 MODULE_DIR="$VASPER_DIR/vasper"

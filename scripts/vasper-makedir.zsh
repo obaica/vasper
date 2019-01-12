@@ -276,14 +276,16 @@ if [[ -n "${opthash[(i)--lobster]}" ]]; then
 fi
 
 if [[ -n "${opthash[(i)--raw_data]}" ]]; then
-  ##### $1: abs path to POSCAR
+  ##### $1: path to POSCAR
   ##### $2: tolerance parse to phonopy
   argnum_check "2" "$#"
   file_does_not_exist_check "raw_data"
   mkdir raw_data
   cp $1 raw_data
+  POSCAR_ABSPATH=$(cd `dirname "$1"`; echo `pwd`/`basename "$1"`)
+  echo "$POSCAR_ABSPATH"
   cd raw_data
-  phonopy --symmetry -c="$1" --tolerance="$2"
+  phonopy --symmetry -c="$POSCAR_ABSPATH" --tolerance="$2"
   touch "vasper.log"
   echo "# phonopy symmetry" | tee -a "vasper.log"
   echo "phonopy --symmetry -c=$1 --tolerance=$2" | tee -a "vasper.log"
