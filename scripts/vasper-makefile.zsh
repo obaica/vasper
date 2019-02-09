@@ -368,6 +368,7 @@ if [[ -n "${opthash[(i)--lobsterin]}" ]]; then
   file_exists_check "$1"
   file_exists_check "$2"
   file_does_not_exist_check "lobsterin"
+  basisSet
   basisfunctions "$2"
   autodistance "$1" "$3"
   mk_detail_files

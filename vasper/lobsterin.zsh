@@ -4,13 +4,6 @@
 # functions for making lobsterin file
 ###############################################################################
 
-function basisfunctions()
-{
-  ##### $1 : POTCAR file
-  echo "! You can also specify the basis functions per element manually" >> lobsterin
-  $MODULE_DIR/potcar.py -p "POTCAR" -o >> lobsterin
-  echo "" >> lobsterin
-}
 function autodistance()
 {
   ##### $1 : POSCAR file
@@ -26,10 +19,26 @@ function autodistance()
   echo "" >> lobsterin
 }
 
+function basisfunctions()
+{
+  ##### $1 : POTCAR file
+  echo "! You can also specify the basis functions per element manually" >> lobsterin
+  $MODULE_DIR/potcar.py -p "POTCAR" -o >> lobsterin
+  echo "" >> lobsterin
+}
+
+function basisSet()
+{
+  ##### $1 : POTCAR file
+  echo "! basisSet, you can choose 'Bunge', 'Koga' or 'pbeVaspFit2015'" >> lobsterin
+  echo "basisSet pbeVaspFit2015" >> lobsterin
+  echo "" >> lobsterin
+}
+
 function mk_detail_files()
 {
-  echo "writeBasisFunctions" >> lobsterin
-  echo "writeMatricesToFile" >> lobsterin
+  echo "! writeBasisFunctions" >> lobsterin
+  echo "! writeMatricesToFile" >> lobsterin
   echo "" >> lobsterin
 }
 
