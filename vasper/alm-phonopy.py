@@ -102,6 +102,7 @@ if args.make_force:
 
     vasprun_files = args.vaspruns.split()
     for filename in vasprun_files:
+        print("reading %s" % filename)
         with io.open(filename, "rb") as fp:
             vasprun = VasprunxmlExpat(fp)
             vasprun.parse()
