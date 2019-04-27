@@ -114,7 +114,7 @@ def get_all_data(vasprun='vasprun.xml', oszicar='OSZICAR'):
     for i in range(len(vasprun_summary['steps_summary'])):
         vasprun_summary['steps_summary'][i]['e_fr_energy'] = oszicar_summary[i]['F']
         vasprun_summary['steps_summary'][i]['e_0_energy'] = oszicar_summary[i]['E0']
-        vasprun_summary['steps_summary'][i]['dF'] = oszicar_summary[i]['dE']
+        vasprun_summary['steps_summary'][i]['dE0'] = oszicar_summary[i]['dE']
         for j in range(len(vasprun_summary['steps_summary'][i]['electronic_steps'])):
             vele_steps = vasprun_summary['steps_summary'][i]['electronic_steps'][j]
             vele_steps['dF'] = oszicar_summary[i]['electronic_steps'][j]['dE']
