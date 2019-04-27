@@ -213,20 +213,21 @@ if [[ -n "${opthash[(i)--dos]}" ]]; then
 fi
 
 if [[ -n "${opthash[(i)--fc2]}" ]]; then
-  ##### $1: fc2 conf
+  ##### $1: vasper_fc2 conf
   source $1
   argnum_check "1" "$#"
   file_exists_check "$P_RELAX_DIRNAME"
   file_does_not_exist_check "$P_DIRNAME"
   source $MODULE_DIR/makejob.zsh
-  JOBNAME=`get_jobname_from_file $P_RELAX_DIRNAME/job_relax.sh | sed s/"relax"/"fc2"/g`
+  JOBNAME=`get_jobname_from_file $P_RELAX_DIRNAME/job_relax.sh | sed s/"relax"/"$P_JOBNAME"/g`
   RELAX_DIR=$(cd $P_RELAX_DIRNAME; pwd)
   echo "making $P_DIRNAME directory"
-  echo "copying CONTCAR INCAR KPOINTS in $P_RELAX_DIRNAME to $P_DIRNAME"
+  echo "copying INCAR KPOINTS in $P_RELAX_DIRNAME to $P_DIRNAME"
   mkdir -p $P_DIRNAME
-  cp $1 $P_DIRNAME
-  cp $P_RELAX_DIRNAME/CONTCAR $P_DIRNAME/POSCAR-unitcell
+  cp $1 $P_DIRNAME/vasper_fc2.conf
   cp $P_RELAX_DIRNAME/POTCAR $P_RELAX_DIRNAME/INCAR $P_RELAX_DIRNAME/KPOINTS $P_DIRNAME
+  echo "copying $P_POSCAR to $P_DIRNAME/POSCAR-unitcell"
+  cp $P_POSCAR $P_DIRNAME/POSCAR-unitcell
   cd $P_DIRNAME
   echo "relax directory : $RELAX_DIR" > "vasper.log"
   echo "making job_fc2.sh"

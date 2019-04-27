@@ -14,30 +14,16 @@ from pymatgen.io import vasp as pmgvasp
 from pymatgen.electronic_structure import plotter as pmgplotter
 
 def print_runmode():
-    print("----------------------")
-    print("run mode and filenames")
-    print("----------------------")
-    print("run mode : 'ele_band'                  filenames : 'vasprun.xml'")
-    print("run mode : 'ele_dos'                   filenames : 'vasprun.xml'")
-    print("run mode : 'ele_element_dos'           filenames : 'vasprun.xml'")
-    print("run mode : 'lobster_dos'               filenames : 'vasprun.xml' 'DOSCAR.lobster'")
-    print("run mode : 'lobster_element_dos'       filenames : 'vasprun.xml' 'DOSCAR.lobster'")
-    print("run mode : 'lobster_element_spd_dos'   filenames : 'vasprun.xml' 'DOSCAR.lobster'")
-    print("run mode : 'lobster_spd_dos'           filenames : 'vasprun.xml' 'DOSCAR.lobster'")
-    print("")
-    print("----------------------")
-    print("run mode and keys")
-    print("----------------------")
-    print("run mode : 'ele_band'                  keys : None")
-    print("run mode : 'ele_dos'                   keys : None")
-    print("run mode : 'ele_element_dos'           keys : None")
-    print("run mode : 'lobster_dos'               keys : None")
-    print("run mode : 'lobster_element_dos'       keys : None")
-    print("run mode : 'lobster_element_spd_dos'   keys : element")
-    print("run mode : 'lobster_spd_dos'           keys : None")
-    print("")
-
-
+    print("---------------")
+    print("argparse inputs")
+    print("---------------")
+    print("run mode : 'ele_band'                  filenames : 'vasprun.xml'                       keys : None")
+    print("run mode : 'ele_dos'                   filenames : 'vasprun.xml'                       keys : None")
+    print("run mode : 'ele_element_dos'           filenames : 'vasprun.xml'                       keys : None")
+    print("run mode : 'lobster_dos'               filenames : 'vasprun.xml' 'DOSCAR.lobster'      keys : None")
+    print("run mode : 'lobster_element_dos'       filenames : 'vasprun.xml' 'DOSCAR.lobster'      keys : None")
+    print("run mode : 'lobster_element_spd_dos'   filenames : 'vasprun.xml' 'DOSCAR.lobster'      keys : element")
+    print("run mode : 'lobster_spd_dos'           filenames : 'vasprun.xml' 'DOSCAR.lobster'      keys : None")
 
 ### Arg-parser
 parser = argparse.ArgumentParser(
@@ -128,7 +114,8 @@ def make_plot(runmode, data, xlim, ylim):
         plotter.add_dos_dict(data)
         plotter.show(xlim=xlim, ylim=ylim)
     elif runmode == 'ele_band':
-        plotter = pmgplotter.BSPlotter(bandstr)
+        #plotter = pmgplotter.BSPlotter(bandstr)
+        plotter = pmgplotter.BSPlotter(data)
         plotter.get_plot(ylim=ylim).show()
     else:
         raise ValueError("runmode : %s is not supported" % args.runmode)

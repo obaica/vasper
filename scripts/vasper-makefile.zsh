@@ -19,6 +19,7 @@ function usage()
 
     --force_sets    make FORCE_SETS file
         \$1: 'alm'
+        \$2: 'fc2'
 
     --get_conf      make conf file
         \$1: 'vasper_fc2'
@@ -32,7 +33,7 @@ function usage()
     --incar_relax   make INCAR for relax
         if ENCUT is less than 10, automatically read 'POTCAR' for extructing ENMAX and ENCUT=ENMAX*ENCUT
         \$1: ENCUT
-        \$2: GGA, ex. "PBEsol"
+        \$2: GGA, ex. "PBEsol" or "91"
 
     --incar_band    make INCAR for band structure
         \$1: INCAR file used in relax
@@ -148,10 +149,17 @@ fi
 
 if [[ -n "${opthash[(i)--force_sets]}" ]]; then
   ##### $1: 'alm'
+  ##### $2: 'fc2'
   if [ "$1" = "alm" ]; then
     # conda activate $ALM_ENV
     $MODULE_DIR/alm-phonopy.py -f --vasprun="`echo disp-*/vasprun.xml`"
     # conda deactivate
+  elif [ "$1" = "fc2" ]; then
+    START=`printf %03d 1`
+    NUM=`find . -type "d" -name "disp-*" | wc -l`
+    echo $NUM
+    END=`printf %03d $NUM`
+    phonopy -f disp-{$START..$END}/vasprun.xml
   else
     unexpected_args "$1"
   fi
