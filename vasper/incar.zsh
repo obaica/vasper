@@ -10,7 +10,7 @@ INCAR_RELAX_SAMPLE="$TEMPLATE_DIR/INCAR_relax"
 function mk_incar_relax()
 {
   ##### $1: ENCUT "1.3" or "500"
-  ##### $2: GGA  ex) "PBEsol" or ""
+  ##### $2: GGA  ex) "GGA" or "PBEsol" or ""
   ENCUT=`revise_encut $1`
   ENCUT_LINE=`grep -n ENCUT $INCAR_RELAX_SAMPLE | sed -e 's/:.*//g'`
   tmpfile=$(mktemp)
@@ -18,7 +18,9 @@ function mk_incar_relax()
   sed -i -e "${ENCUT_LINE}i ENCUT = ${ENCUT}" $tmpfile
   cat $tmpfile > INCAR
   rm $tmpfile
-  if [[ "$2" = "PBEsol" ]]; then
+  if [[ "$2" = "91" ]]; then
+    echo "GGA = 91" >> INCAR
+  elif [[ "$2" = "PBEsol" ]]; then
     echo "GGA = PS" >> INCAR
   fi
 }
