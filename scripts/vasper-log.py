@@ -32,6 +32,8 @@ parser.add_argument('-log', '--vasper_file', type=str, default='vasper-log.yaml'
 ### output option
 parser.add_argument('-all', '--all_sum', action='store_true',
                     help="show all summary output from vasper-log.yaml")
+parser.add_argument('-es', '--each_step', action='store_true',
+                    help="show each step summary output from vasper-log.yaml")
 parser.add_argument('-pr', '--params', action='store_true',
                     help="show vasp run all parameters, \
                           not just parameters written in INCAR")
@@ -88,6 +90,19 @@ if __name__ == "__main__":
         print("### vasper-log.yaml all summary")
         for key in vlog['all_summary'].keys():
             print(key + ' : ' + str(vlog['all_summary'][key]))
+
+    if args.each_step:
+        print("")
+        print("### vasper-log.yaml each step")
+        for i, step in enumerate(vlog['steps_summary']):
+            print("#######")
+            print("step %s" % str(i+1))
+            print("#######")
+            for key in vlog['steps_summary'][i].keys():
+                if key == 'electronic_steps':
+                    continue
+                print(key + ' : ' + str(vlog['steps_summary'][i][key]))
+            print("")
 
     if args.params:
         print("")
