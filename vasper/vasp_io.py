@@ -85,6 +85,8 @@ def get_vasrun_data(vasprun):
     all_summary['in_kB'] = steps_summary[-1]['in_kB']
     all_summary['Pullay_stress'] = steps_summary[-1]['Pullay_stress']
     all_summary['atom_num'] = atom_num
+    all_summary['forces'] = steps_summary[-1]['forces']
+    all_summary['stress'] = steps_summary[-1]['stress']
     # for i in range(len(steps_summary)-1):
     #     all_summary['energy_diff_per_steps'].append(
     #             steps_summary[i+1]['e_wo_entrp'] - steps_summary[i]['e_wo_entrp'])
@@ -121,4 +123,6 @@ def get_all_data(vasprun='vasprun.xml', oszicar='OSZICAR'):
             vele_steps['deps'] = oszicar_summary[i]['electronic_steps'][j]['deps']
             vele_steps['ncg'] = oszicar_summary[i]['electronic_steps'][j]['ncg']
             vele_steps['rms'] = oszicar_summary[i]['electronic_steps'][j]['rms']
+    vasprun_summary['all_summary']['dF_final_ion_final_ele_step'] = vasprun_summary['steps_summary'][-1]['electronic_steps'][-1]['dF']
+    vasprun_summary['all_summary']['dE0_final_ion_step'] = vasprun_summary['steps_summary'][-1]['dE0']
     return vasprun_summary

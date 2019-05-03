@@ -13,6 +13,7 @@ import pandas as pd
 from pymatgen.io import vasp as pmgvasp
 import numpy as np
 from vasper import vasp_io
+import yaml
 
 ### Arg-parser
 parser = argparse.ArgumentParser(
@@ -25,8 +26,12 @@ parser.add_argument('-vf', '--vasprun_file', type=str, default='vasprun.xml',
                     help="input vasprun.xml file")
 parser.add_argument('-os', '--oszicar_file', type=str, default='OSZICAR',
                     help="input oszicar file")
+parser.add_argument('-log', '--vasper_file', type=str, default='vasper-log.yaml',
+                    help="input vasper-log.yaml file")
 
 ### output option
+parser.add_argument('-all', '--all_sum', action='store_true',
+                    help="show all summary output from vasper-log.yaml")
 parser.add_argument('-pr', '--params', action='store_true',
                     help="show vasp run all parameters, \
                           not just parameters written in INCAR")
@@ -59,20 +64,30 @@ def read_files(filepath):
     fname = os.path.basename(filepath)
     try:
         if fname == 'vasprun.xml':
-            pmgobj = pmgvasp.outputs.Vasprun(fname)
+            outobj = pmgvasp.outputs.Vasprun(filepath)
         if fname == 'OSZICAR':
-            pmgobj = pmgvasp.outputs.Oszicar(fname)
+            outobj = pmgvasp.outputs.Oszicar(filepath)
+        if fname == 'vasper-log.yaml':
+            with open(filepath) as f:
+                outobj = yaml.load(f)
         print("read : %s" % filepath)
     except:
-        pmgobj = None
+        outobj = None
         print("not read : %s" % filepath)
-    return pmgobj
+    return outobj
 
 ### main
 if __name__ == "__main__":
     # check_file_exist(args.vasprun_file)
     vasprun = read_files(args.vasprun_file)
     oszicar = read_files(args.oszicar_file)
+    vlog = read_files(args.vasper_file)
+
+    if args.all_sum:
+        print("")
+        print("### vasper-log.yaml all summary")
+        for key in vlog['all_summary'].keys():
+            print(key + ' : ' + str(vlog['all_summary'][key]))
 
     if args.params:
         print("")
