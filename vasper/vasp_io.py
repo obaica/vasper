@@ -28,7 +28,7 @@ def get_oszicar_data(oszicar):
         summary[i]['electronic_steps'] = oszicar.electronic_steps[i]
     return summary
 
-def get_vasrun_data(vasprun):
+def get_vasprun_data(vasprun):
     """
     get important data from vasprun.xml
 
@@ -111,7 +111,7 @@ def get_all_data(vasprun='vasprun.xml', oszicar='OSZICAR'):
         summary : dict
             all data
     """
-    vasprun_summary = get_vasrun_data(vasprun)
+    vasprun_summary = get_vasprun_data(vasprun)
     oszicar_summary = get_oszicar_data(oszicar)
     for i in range(len(vasprun_summary['steps_summary'])):
         vasprun_summary['steps_summary'][i]['e_fr_energy'] = oszicar_summary[i]['F']
