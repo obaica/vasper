@@ -89,6 +89,9 @@ function usage()
         \$2: variable name
 
     --revise_setting    revise conf or INCAR setting
+        ### WARNING
+        # if you set P_DIRNAME, do like this
+        # "\\.\\/stropt\\/kptest\\/stropt_300_10108_gamma"
         if cannot find 'variable name', make new line
         \$1: filename (support filetype : *.conf , INCAR)
         \$2: variable name

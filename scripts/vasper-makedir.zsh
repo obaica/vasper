@@ -311,6 +311,7 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   cp $1 $P_DIRNAME
   cp $P_POSFILE $P_DIRNAME/POSCAR
   mv "vasper.log" $P_DIRNAME
+  cp $1 $P_DIRNAME
   cd $P_DIRNAME
   echo "~~ making job_relax.sh ~~" | tee -a "vasper.log"
   echo "job name : $P_JOBNAME" | tee -a "vasper.log"

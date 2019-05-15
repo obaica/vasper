@@ -14,6 +14,7 @@ from pymatgen.io import vasp as pmgvasp
 import numpy as np
 from vasper import vasp_io
 import yaml
+from yaml import CLoader as Loader
 
 ### Arg-parser
 parser = argparse.ArgumentParser(
@@ -71,7 +72,7 @@ def read_files(filepath):
             outobj = pmgvasp.outputs.Oszicar(filepath)
         if fname == 'vasper-log.yaml':
             with open(filepath) as f:
-                outobj = yaml.load(f)
+                outobj = yaml.load(f, Loader=Loader)
         print("read : %s" % filepath)
     except:
         outobj = None
