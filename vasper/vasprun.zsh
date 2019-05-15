@@ -100,6 +100,7 @@ function run()
         return 0
       fi
     fi
+    mv CONTCAR POSCAR
   done
   echo "too many repeats"
   exit 1
