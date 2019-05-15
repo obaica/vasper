@@ -72,6 +72,7 @@ def get_vasprun_data(vasprun):
         steps_summary.append(step_sum)
 
     all_summary = {}
+    all_summary['converged'] = vasprun_sum['has_vasp_completed']
     all_summary['final_energy'] = float(vasprun_sum['output']['final_energy'])
     all_summary['final_energy_per_atom'] = \
             float(vasprun_sum['output']['final_energy_per_atom'])
