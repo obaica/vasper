@@ -1,0 +1,5 @@
+OPT   IBRION   EDIFF   EDIFFG   NSW   REPEAT
+opt1  2        1e-3    -1e-2    40    3
+opt2  1        1e-6    -1e-4    20    3
+opt3  1        1e-7    -1e-6    10    5
+opt4  1        1e-8    -1e-8    10    10

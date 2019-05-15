@@ -1,7 +1,7 @@
 PREC = Accurate
 IBRION = 2
 NSW = 40
-NELMIN = 10
+NELMIN = 5
 ISIF = 3
 ENCUT = 500
 EDIFF = 1e-6
