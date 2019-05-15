@@ -309,6 +309,7 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   echo "POSCAR file : `pwd`/$P_POSFILE"
   echo "" | tee -a "vasper.log"
   cp $1 $P_DIRNAME
+  cp $TEMPLATE_DIR/vasper_relax.dat $P_DIRNAME
   cp $P_POSFILE $P_DIRNAME/POSCAR
   mv "vasper.log" $P_DIRNAME
   cp $1 $P_DIRNAME

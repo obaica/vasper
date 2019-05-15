@@ -277,7 +277,7 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
     touch "job_relax.sh"
     job_header $2 >> "job_relax.sh"
     echo "" >> "job_relax.sh"
-    vasprun_command >> "job_relax.sh"
+    cat $TEMPLATE_DIR/job_relax.sh >> "job_relax.sh"
   elif [ "$1" = "alm" ]; then
     touch "job_alm.sh"
     job_header $2 >> "job_alm.sh"

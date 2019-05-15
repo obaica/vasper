@@ -72,7 +72,6 @@ function revise_incar_param()
   tmpfile=$(mktemp)
   echo "revising : $PARAM_LINE => $2 = $3"
   # cat "$1" | sed s/"$PARAM_LINE"/"$2 = $3"/g >> $tmpfile
-  echo $PARAM_LINE
   cat "$1" | sed s/"$PARAM_LINE"/"$2 = $3"/g >> $tmpfile
   rm -f $1
   mv $tmpfile $1
