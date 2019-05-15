@@ -72,8 +72,8 @@ function revise_incar_param()
   # cat "$1" | sed s/"$PARAM_LINE"/"$2 = $3"/g >> $tmpfile
   echo $PARAM_LINE
   cat "$1" | sed s/"$PARAM_LINE"/"$2 = $3"/g >> $tmpfile
-  # rm -f $1
-  # mv $tmpfile $1
+  rm -f $1
+  mv $tmpfile $1
 }
 
 function make_new_incar_line_when_not_found()
