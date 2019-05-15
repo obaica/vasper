@@ -66,11 +66,20 @@ def read_files(filepath):
     """
     fname = os.path.basename(filepath)
     try:
-        if fname == 'vasprun.xml':
+        # if fname == 'vasprun.xml':
+        #     outobj = pmgvasp.outputs.Vasprun(filepath)
+        # if fname == 'OSZICAR':
+        #     outobj = pmgvasp.outputs.Oszicar(filepath)
+        # if fname == 'vasper-log.yaml':
+        #     with open(filepath) as f:
+        #         outobj = yaml.load(f, Loader=Loader)
+        # print("read : %s" % filepath)
+
+        if 'vasprun.xml' in fname:
             outobj = pmgvasp.outputs.Vasprun(filepath)
-        if fname == 'OSZICAR':
+        if 'OSZICAR' in fname:
             outobj = pmgvasp.outputs.Oszicar(filepath)
-        if fname == 'vasper-log.yaml':
+        if 'vasper-log.yaml' in fname:
             with open(filepath) as f:
                 outobj = yaml.load(f, Loader=Loader)
         print("read : %s" % filepath)
