@@ -182,6 +182,7 @@ if [[ -n "${opthash[(i)--get_conf]}" ]]; then
   if [ "$1" = "vasper_relax" ]; then
     argnum_check "1" "$#"
     cp $TEMPLATE_DIR/${1}.conf ./${1}.conf
+    cp $TEMPLATE_DIR/${1}.dat ./${1}.dat
   elif [ "$1" = "vasper_fc2" ]; then
     argnum_check "1" "$#"
     cp $TEMPLATE_DIR/${1}.conf ./${1}.conf

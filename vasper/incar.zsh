@@ -7,10 +7,24 @@
 ### constants
 INCAR_RELAX_SAMPLE="$TEMPLATE_DIR/INCAR_relax"
 
+function revise_encut()
+{
+  ##### if $1 is less than 10, read ENMAX from POTCAR and excute ENMAX * $1
+  ##### $1: ENCUT "1.3" or "500"
+  if [ `echo $(($1<10))` -eq 1 ]; then
+    source $MODULE_DIR/potcar.zsh
+    ENMAX=`get_enmax_from_potcar "POTCAR"`
+    ENCUT=`echo $(($ENMAX*$1)) | sed 's/\.[^\.]*$//'`
+  else
+    ENCUT=$1
+  fi
+  echo $ENCUT
+}
+
 function mk_incar_relax()
 {
   ##### $1: ENCUT "1.3" or "500"
-  ##### $2: GGA  ex) "PBE" or "PBEsol" or
+  ##### $2: GGA  ex) "PBE" or "PBEsol" or "LDA"
   ENCUT=`revise_encut $1`
   ENCUT_LINE=`grep -n ENCUT $INCAR_RELAX_SAMPLE | sed -e 's/:.*//g'`
   tmpfile=$(mktemp)
@@ -22,22 +36,11 @@ function mk_incar_relax()
     echo "GGA = PS" >> INCAR
   elif [[ "$2" = "PBE" ]]; then
     :
+  elif [[ "$2" = "LDA" ]]; then
+    :
   else
     unexpected_args "$2"
   fi
-}
-
-function revise_encut()
-{
-  ##### if $1 is less than 10, read ENMAX from POTCAR and excute ENMAX * $1 #### $1: ENCUT "1.3" or "500"
-  if [ `echo $(($1<10))` -eq 1 ]; then
-    source $MODULE_DIR/potcar.zsh
-    ENMAX=`get_enmax_from_potcar "POTCAR"`
-    ENCUT=`echo $(($ENMAX*$1)) | sed 's/\.[^\.]*$//'`
-  else
-    ENCUT=$1
-  fi
-  echo $ENCUT
 }
 
 function remove_incar_setting()

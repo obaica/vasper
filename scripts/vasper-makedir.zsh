@@ -46,14 +46,20 @@ function usage()
 
     --relax         make relax directory
         \$1: 'vasper_relax.conf'
+        \$2: 'vasper_relax.dat'
+
+    --relax_multi   make multiple relax directory
+        \$1: 'vasper_relax.conf'
+        \$2: 'vasper_relax.dat'
+        \$3: ENCUT    ex. "300 350 400 450"
+        \$4: KPOINTS    ex. "10 10 8, 12 12 10, 14 14 10"
 
   Exit:
     0   : normal
     1   : unexpected error
 
     255 : Nothing was excuted.
-    254 : The number of argments were different from expected.
-    253 : The file you tried to make already exists.
+    254 : The number of argments were different from expected.  253 : The file you tried to make already exists.
     252 : The file which needs to process does not exist.
     251 : Unexpected argments were parsed.
     250 : You tried to run in the uncorrect directory.
@@ -69,7 +75,7 @@ source $MODULE_DIR/error-codes.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -alm -band -born -disp -dos -fc2 -lobster -raw_data -relax
+zparseopts -D -A opthash -- h -alm -band -born -disp -dos -fc2 -lobster -raw_data -relax -relax_multi
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
@@ -296,11 +302,18 @@ fi
 
 if [[ -n "${opthash[(i)--relax]}" ]]; then
   ##### $1: relax conf file
+  ##### $2: 'vasper_relax.dat'
   source $MODULE_DIR/incar.zsh
-  argnum_check "1" "$#"
+  argnum_check "2" "$#"
   source $1
   file_exists_check "$P_POSFILE"
   file_does_not_exist_check "$P_DIRNAME"
+  if [ "$P_DIRNAME" = "" ]; then
+    local FLAG=1
+    echo "P_DIRNAME is vacant"
+    echo "make temporary directory, rename at the last"
+    P_DIRNAME=`mktemp -d`
+  fi
   touch "vasper.log"
   echo "making $P_DIRNAME directory" | tee -a "vasper.log"
   echo "" | tee -a "vasper.log"
@@ -309,19 +322,17 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   echo "POSCAR file : `pwd`/$P_POSFILE"
   echo "" | tee -a "vasper.log"
   cp $1 $P_DIRNAME
-  cp $TEMPLATE_DIR/vasper_relax.dat $P_DIRNAME
+  cp $2 $P_DIRNAME
   cp $P_POSFILE $P_DIRNAME/POSCAR
   mv "vasper.log" $P_DIRNAME
   cp $1 $P_DIRNAME
   cd $P_DIRNAME
-  echo "~~ making job_relax.sh ~~" | tee -a "vasper.log"
-  echo "job name : $P_JOBNAME" | tee -a "vasper.log"
-  echo "" | tee -a "vasper.log"
-  vasper-makefile.zsh --job "relax" "$P_JOBNAME"
+
   echo "~~ making POTCAR ~~" | tee -a "vasper.log"
   echo "psudopotential : $P_PSP" | tee -a "vasper.log"
   echo "" | tee -a "vasper.log"
   vasper-makefile.zsh --potcar "default" "$P_PSP"
+
   echo "~~ making KPOINTS ~~" | tee -a "vasper.log"
   echo "sampling method : $P_KSAMP_METHOD" | tee -a "vasper.log"
   echo "sampling num : $P_KNUM" | tee -a "vasper.log"
@@ -333,6 +344,7 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
     vasper-makefile.zsh --kpoints "$P_KSAMP_METHOD" "$P_KNUM" "$P_KSHIFT"
   fi
   echo "" | tee -a "vasper.log"
+
   echo "~~ making INCAR ~~" | tee -a "vasper.log"
   echo "ENCUT : $P_ENCUT" | tee -a "vasper.log"
   echo "EDIFF : $P_EDIFF" | tee -a "vasper.log"
@@ -340,7 +352,49 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   vasper-makefile.zsh --incar_relax "$P_ENCUT" "$P_PSP"
   revise_incar_param "INCAR" "EDIFF" "$P_EDIFF"
   revise_incar_param "INCAR" "EDIFFG" "$P_EDIFFG"
+
+  echo "~~ making job_relax.sh ~~" | tee -a "vasper.log"
+  if [ "$FLAG" = 1 ]; then
+    local KNUM=(`echo $P_KNUM`)
+    local EC=`revise_encut "$P_ENCUT"`
+    NEW_DIRNAME="${P_PSP}_`printf %02d $KNUM[1]``printf %02d $KNUM[2]``printf %02d $KNUM[3]`_$EC"
+  fi
+  if [ "$P_JOBNAME" = "" ]; then
+    P_JOBNAME=${NEW_DIRNAME}_relax
+  fi
+  echo "job name : $P_JOBNAME" | tee -a "vasper.log"
+  echo "" | tee -a "vasper.log"
+  vasper-makefile.zsh --job "relax" "$P_JOBNAME"
+
   cd -
+  if [ "$FLAG" = 1 ]; then
+    echo "rename directory : $P_DIRNAME => $NEW_DIRNAME"
+    file_does_not_exist_check "$NEW_DIRNAME"
+    mv $P_DIRNAME $NEW_DIRNAME
+  fi
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--relax_multi]}" ]]; then
+  ##### $1: 'vasper_relax.conf'
+  ##### $2: 'vasper_relax.dat'
+  ##### $3: ENCUT    ex. "300 350 400 450"
+  ##### $4: KPOINTS    ex. "10 10 8, 12 12 10, 14 14 10"
+  argnum_check "4" "$#"
+  for EN in `echo $3`
+  do
+    comma_num=`echo $4 | sed s/"[0-9 ]"//g`
+    arr_num=$(($#comma_num+1))
+    for i in {1..${arr_num}}
+    do
+      KP=`echo $4 | cut -f $i -d ","`
+      vasper-makefile.zsh --revise_setting "$1" "P_ENCUT" "$EN"
+      vasper-makefile.zsh --revise_setting "$1" "P_KNUM" "$KP"
+      vasper-makefile.zsh --revise_setting "$1" "P_DIRNAME" ""
+      vasper-makefile.zsh --revise_setting "$1" "P_JOBNAME" ""
+      vasper-makedir.zsh --relax "$1" "$2"
+    done
+  done
   exit 0
 fi
 
