@@ -33,7 +33,7 @@ function usage()
     --incar_relax   make INCAR for relax
         if ENCUT is less than 10, automatically read 'POTCAR' for extructing ENMAX and ENCUT=ENMAX*ENCUT
         \$1: ENCUT
-        \$2: GGA, ex. "PBEsol" or "91"
+        \$2: GGA, ex. "PBEsol" or "LDA" or "PBE"
 
     --incar_band    make INCAR for band structure
         \$1: INCAR file used in relax

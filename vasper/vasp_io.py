@@ -8,6 +8,8 @@
 ### import modules
 import os
 import numpy as np
+import yaml
+from yaml import CLoader as Loader
 
 def get_oszicar_data(oszicar):
     """
@@ -127,3 +129,16 @@ def get_all_data(vasprun='vasprun.xml', oszicar='OSZICAR'):
     vasprun_summary['all_summary']['dF_final_ion_final_ele_step'] = vasprun_summary['steps_summary'][-1]['electronic_steps'][-1]['dF']
     vasprun_summary['all_summary']['dE0_final_ion_step'] = vasprun_summary['steps_summary'][-1]['dE0']
     return vasprun_summary
+
+def load_yaml(yamlfile):
+    """
+    load yaml type file
+
+        Parameters
+        ----------
+        yamlfile : str
+            ex. vasper-log.yaml file
+    """
+    with open(yamlfile, 'r') as f:
+        data = yaml.load(f, Loader=Loader)
+    return data

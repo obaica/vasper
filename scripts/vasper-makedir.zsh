@@ -346,18 +346,31 @@ if [[ -n "${opthash[(i)--relax]}" ]]; then
   echo "" | tee -a "vasper.log"
 
   echo "~~ making INCAR ~~" | tee -a "vasper.log"
-  echo "ENCUT : $P_ENCUT" | tee -a "vasper.log"
-  echo "EDIFF : $P_EDIFF" | tee -a "vasper.log"
+  echo "ENCUT  : $P_ENCUT"  | tee -a "vasper.log"
+  echo "EDIFF  : $P_EDIFF"  | tee -a "vasper.log"
   echo "EDIFFG : $P_EDIFFG" | tee -a "vasper.log"
+  echo "ISMEAR : $P_ISMEAR" | tee -a "vasper.log"
+  echo "SIGMA  : $P_SIGMA"  | tee -a "vasper.log"
+  echo "ISIF   : $P_ISIF"   | tee -a "vasper.log"
   vasper-makefile.zsh --incar_relax "$P_ENCUT" "$P_PSP"
   revise_incar_param "INCAR" "EDIFF" "$P_EDIFF"
   revise_incar_param "INCAR" "EDIFFG" "$P_EDIFFG"
+  revise_incar_param "INCAR" "ISMEAR" "$P_ISMEAR"
+  revise_incar_param "INCAR" "SIGMA" "$P_SIGMA"
+  revise_incar_param "INCAR" "ISIF" "$P_ISIF"
 
   echo "~~ making job_relax.sh ~~" | tee -a "vasper.log"
   if [ "$FLAG" = 1 ]; then
     local KNUM=(`echo $P_KNUM`)
     local EC=`revise_encut "$P_ENCUT"`
-    NEW_DIRNAME="${P_PSP}_`printf %02d $KNUM[1]``printf %02d $KNUM[2]``printf %02d $KNUM[3]`_$EC"
+    if [ "$P_ISMEAR" = -5 ]; then
+      local ISMR='t'
+    elif [ "$P_ISMEAR" = 0 ]; then
+      local ISMR='g'
+    else
+      local ISMR='m'
+    fi
+    NEW_DIRNAME="${P_PSP}_`printf %02d $KNUM[1]``printf %02d $KNUM[2]``printf %02d $KNUM[3]`_${EC}_`printf %.2f ${P_SIGMA}`${ISMR}"
   fi
   if [ "$P_JOBNAME" = "" ]; then
     P_JOBNAME=${NEW_DIRNAME}_relax
@@ -380,19 +393,24 @@ if [[ -n "${opthash[(i)--relax_multi]}" ]]; then
   ##### $2: 'vasper_relax.dat'
   ##### $3: ENCUT    ex. "300 350 400 450"
   ##### $4: KPOINTS    ex. "10 10 8, 12 12 10, 14 14 10"
-  argnum_check "4" "$#"
-  for EN in `echo $3`
+  ##### $5: SIGMA    ex. "0.05 0.1 0.2 0.3"
+  argnum_check "5" "$#"
+  for SGM in `echo $5`
   do
-    comma_num=`echo $4 | sed s/"[0-9 ]"//g`
-    arr_num=$(($#comma_num+1))
-    for i in {1..${arr_num}}
+    for EN in `echo $3`
     do
-      KP=`echo $4 | cut -f $i -d ","`
-      vasper-makefile.zsh --revise_setting "$1" "P_ENCUT" "$EN"
-      vasper-makefile.zsh --revise_setting "$1" "P_KNUM" "$KP"
-      vasper-makefile.zsh --revise_setting "$1" "P_DIRNAME" ""
-      vasper-makefile.zsh --revise_setting "$1" "P_JOBNAME" ""
-      vasper-makedir.zsh --relax "$1" "$2"
+      comma_num=`echo $4 | sed s/"[0-9 ]"//g`
+      arr_num=$(($#comma_num+1))
+      for i in {1..${arr_num}}
+      do
+        KP=`echo $4 | cut -f $i -d ","`
+        vasper-makefile.zsh --revise_setting "$1" "P_ENCUT" "$EN"
+        vasper-makefile.zsh --revise_setting "$1" "P_KNUM" "$KP"
+        vasper-makefile.zsh --revise_setting "$1" "P_SIGMA" "$SGM"
+        vasper-makefile.zsh --revise_setting "$1" "P_DIRNAME" ""
+        vasper-makefile.zsh --revise_setting "$1" "P_JOBNAME" ""
+        vasper-makedir.zsh --relax "$1" "$2"
+      done
     done
   done
   exit 0
