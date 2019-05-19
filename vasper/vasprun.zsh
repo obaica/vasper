@@ -81,6 +81,9 @@ function run()
   cp POSCAR POSCAR_0
   for i in {1..${1}}
   do
+    if [ -e CONTCAR ]; then
+      mv CONTCAR POSCAR
+    fi
     /usr/local/calc/openmpi/bin/mpirun /usr/local/calc/vasp/vasp541mpi
     vasper-log.py -ym
     if [ ! -e "vasper-log.yaml" ]; then
@@ -100,7 +103,6 @@ function run()
         return 0
       fi
     fi
-    mv CONTCAR POSCAR
   done
   echo "too many repeats"
   exit 1

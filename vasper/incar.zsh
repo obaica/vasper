@@ -167,3 +167,13 @@ function mk_incar_lobster()
   make_new_incar_line_when_not_found $1 "ISYM" "-1"
   echo "# ICHARG = 11" >> $1
 }
+
+function mk_incar_static()
+{
+  ##### $1: INCAR used in relax
+  revise_incar_param $1 "IBRION" "-1"
+  revise_incar_param $1 "NSW" "0"
+  remove_incar_setting $1 "EDIFFG"
+  remove_incar_setting $1 "ISIF"
+}
+
