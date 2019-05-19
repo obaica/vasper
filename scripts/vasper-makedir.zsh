@@ -55,6 +55,10 @@ function usage()
         \$4: KPOINTS    ex. "10 10 8, 12 12 10, 14 14 10"
         \$5: SIGMA    ex. "0.05 0.1 0.2 0.3"
 
+    --static        make static directory
+        \$1: relax dirname
+        \$2: static dirname
+
   Exit:
     0   : normal
     1   : unexpected error
@@ -76,7 +80,7 @@ source $MODULE_DIR/error-codes.zsh
 
 ### zparseopts
 local -A opthash
-zparseopts -D -A opthash -- h -alm -band -born -disp -dos -fc2 -lobster -raw_data -relax -relax_multi
+zparseopts -D -A opthash -- h -alm -band -born -disp -dos -fc2 -lobster -raw_data -relax -relax_multi -static
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
@@ -414,6 +418,32 @@ if [[ -n "${opthash[(i)--relax_multi]}" ]]; then
       done
     done
   done
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--static]}" ]]; then
+  ##### $1: relax dirname
+  ##### $2: static dirname
+  argnum_check "2" "$#"
+  file_exists_check "$1"
+  file_does_not_exist_check "$2"
+  source $MODULE_DIR/makejob.zsh
+  source $MODULE_DIR/vasprun.zsh
+  OPT_NUM=`cd $1; getoptnum`
+  RELAX_DIR=$1/opt$OPT_NUM
+  echo $RELAX_DIR
+  JOBNAME=`get_jobname_from_file $1/job_relax.sh | sed s/"relax"/"static"/g`
+  echo $RELAX_DIR
+  echo "making $2 directory"
+  echo "copying CONTCAR INCAR KPOINTS in $RELAX_DIR to static"
+  mkdir -p $2
+  cp $RELAX_DIR/CONTCAR $2/POSCAR
+  cp $RELAX_DIR/POTCAR $RELAX_DIR/INCAR $RELAX_DIR/KPOINTS $2
+  cd $2
+  echo "makeing job_static.sh"
+  vasper-makefile.zsh --job "static" "$JOBNAME"
+  echo "revising INCAR"
+  vasper-makefile.zsh --incar_static "INCAR"
   exit 0
 fi
 

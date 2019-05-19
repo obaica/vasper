@@ -47,6 +47,9 @@ function usage()
     --incar_fc2     make INCAR for fc2
         \$1: INCAR file used in relax
 
+    --incar_static  make INCAR for static calculation
+        \$1: INCAR file used in relax
+
     --incar_lobster    make INCAR for dos
         \$1: INCAR file used in relax
         \$1: vasprun.xml file used in relax
@@ -54,7 +57,7 @@ function usage()
         \$3: POTCAR file
 
     --job           make job.sh
-        \$1: run mode 'relax' 'alm' 'band' 'born' 'dos' 'fc2' 'lobster'
+        \$1: run mode 'relax' 'alm' 'band' 'born' 'dos' 'fc2' 'static' 'lobster'
         \$2: jobname
 
     --kpoints       make KPOINTS
@@ -130,6 +133,7 @@ zparseopts -D -A opthash -- h \
            -incar_fc2 \
            -incar_lobster \
            -incar_relax \
+           -incar_static \
            -job \
            -kpoints \
            -kpoints_newmesh \
@@ -247,6 +251,15 @@ if [[ -n "${opthash[(i)--incar_fc2]}" ]]; then
   exit 0
 fi
 
+if [[ -n "${opthash[(i)--incar_static]}" ]]; then
+  ##### $1: INCAR file used in relax
+  source $MODULE_DIR/incar.zsh
+  argnum_check "1" "$#"
+  file_exists_check "$1"
+  mk_incar_fc2 "$1"
+  exit 0
+fi
+
 if [[ -n "${opthash[(i)--incar_lobster]}" ]]; then
   ##### $1: INCAR file used in relax
   ##### $2: vasprun.xml file used in relax
@@ -308,6 +321,11 @@ if [[ -n "${opthash[(i)--job]}" ]]; then
     job_header $2 >> "job_fc2.sh"
     echo "" >> "job_fc2.sh"
     vasprun_command >> "job_fc2.sh"
+  elif [ "$1" = "static" ]; then
+    touch "job_static.sh"
+    job_header $2 >> "job_static.sh"
+    echo "" >> "job_static.sh"
+    vasprun_command >> "job_static.sh"
   elif [ "$1" = "lobster" ]; then
     touch "job_lobster.sh"
     job_header $2 >> "job_lobster.sh"
