@@ -71,6 +71,9 @@ def get_vasprun_data(vasprun):
         # for key in enery_lst:
         #     step_sum[key] = step_sum['electronic_steps'][-1][key]
         step_sum['e_wo_entrp'] = step_sum['electronic_steps'][-1]['e_wo_entrp']
+        step_sum['e_fr_energy-e_0_energy'] \
+                = step_sum['electronic_steps'][-1]['e_fr_energy'] \
+                    - step_sum['electronic_steps'][-1]['e_0_energy']
         steps_summary.append(step_sum)
 
     all_summary = {}
@@ -79,17 +82,22 @@ def get_vasprun_data(vasprun):
     all_summary['final_energy_per_atom'] = \
             float(vasprun_sum['output']['final_energy_per_atom'])
     all_summary['volume'] = vasprun_sum['output']['crystal']['lattice']['volume']
-    kpt = vasprun_sum['input']['kpoints']['kpoints'][0]
-    all_summary['total_kpoints'] = kpt[0] * kpt[1] * kpt[2]
-    all_summary['kpoints'] = [kpt[0], kpt[1], kpt[2]]
-    all_summary['nkpoints'] = vasprun_sum['input']['nkpoints']
-    all_summary['encut'] = vasprun_sum['input']['parameters']['ENMAX']
     all_summary['correlation_function'] = vasprun_sum['run_type']
     all_summary['in_kB'] = steps_summary[-1]['in_kB']
     all_summary['Pullay_stress'] = steps_summary[-1]['Pullay_stress']
     all_summary['atom_num'] = atom_num
     all_summary['forces'] = steps_summary[-1]['forces']
     all_summary['stress'] = steps_summary[-1]['stress']
+    all_summary['e_fr_energy-e_0_energy'] = steps_summary[-1]['e_fr_energy-e_0_energy']
+    all_summary['hoge'] = steps_summary[-1]['e_fr_energy-e_0_energy']
+
+    ### input
+    kpt = vasprun_sum['input']['kpoints']['kpoints'][0]
+    all_summary['total_kpoints'] = kpt[0] * kpt[1] * kpt[2]
+    all_summary['kpoints'] = [kpt[0], kpt[1], kpt[2]]
+    all_summary['nkpoints'] = vasprun_sum['input']['nkpoints']
+    all_summary['encut'] = vasprun_sum['input']['parameters']['ENMAX']
+    all_summary['sigma'] = vasprun_sum['input']['parameters']['SIGMA']
     # for i in range(len(steps_summary)-1):
     #     all_summary['energy_diff_per_steps'].append(
     #             steps_summary[i+1]['e_wo_entrp'] - steps_summary[i]['e_wo_entrp'])

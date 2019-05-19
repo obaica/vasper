@@ -53,6 +53,7 @@ function usage()
         \$2: 'vasper_relax.dat'
         \$3: ENCUT    ex. "300 350 400 450"
         \$4: KPOINTS    ex. "10 10 8, 12 12 10, 14 14 10"
+        \$5: SIGMA    ex. "0.05 0.1 0.2 0.3"
 
   Exit:
     0   : normal

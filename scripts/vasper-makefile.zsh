@@ -97,6 +97,9 @@ function usage()
         \$2: variable name
         \$3: revise name
 
+    --potcar_relink    relink potcar
+        \$1: stropt directory
+
   Exit:
     0   : normal
     1   : unexpected error
@@ -134,7 +137,8 @@ zparseopts -D -A opthash -- h \
            -lobsterin \
            -potcar \
            -remove_setting \
-           -revise_setting
+           -revise_setting \
+           -potcar_relink
 
 ### option
 if [[ -n "${opthash[(i)-h]}" ]]; then
@@ -438,6 +442,16 @@ if [[ -n "${opthash[(i)--revise_setting]}" ]]; then
   else
     unexpected_args $1
   fi
+  exit 0
+fi
+
+if [[ -n "${opthash[(i)--potcar_relink]}" ]]; then
+  ##### $1: stropt directory
+  file_exists_check "$1/POTCAR"
+  for optdir in `ls $1 | grep 'opt[1-9]'`
+  do
+    (cd $1; ln -snf "`pwd`/POTCAR" "`pwd`/$optdir/POTCAR")
+  done
   exit 0
 fi
 
