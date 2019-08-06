@@ -230,7 +230,14 @@ if [[ -n "${opthash[(i)--fc2]}" ]]; then
   file_exists_check "$P_RELAX_DIRNAME"
   file_does_not_exist_check "$P_DIRNAME"
   source $MODULE_DIR/makejob.zsh
-  JOBNAME=`get_jobname_from_file $P_RELAX_DIRNAME/job_relax.sh | sed s/"relax"/"$P_JOBNAME"/g`
+  if [ "$P_JOBNAME" = "" ]; then
+    P_JOBNAME="fc2"
+  fi
+  if [ -e $P_RELAX_DIRNAME/job_relax.sh ]; then
+    JOBNAME=`get_jobname_from_file $P_RELAX_DIRNAME/job_relax.sh | sed s/"relax"/"$P_JOBNAME"/g`
+  else
+    JOBNAME=`get_jobname_from_file $P_RELAX_DIRNAME/job_static.sh | sed s/"static"/"$P_JOBNAME"/g`
+  fi
   RELAX_DIR=$(cd $P_RELAX_DIRNAME; pwd)
   echo "making $P_DIRNAME directory"
   echo "copying INCAR KPOINTS in $P_RELAX_DIRNAME to $P_DIRNAME"

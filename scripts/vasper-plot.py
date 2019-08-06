@@ -27,7 +27,7 @@ def print_runmode():
     print("run mode : 'lobster_element_dos'       filenames : 'vasprun.xml' 'DOSCAR.lobster'      keys : None")
     print("run mode : 'lobster_element_spd_dos'   filenames : 'vasprun.xml' 'DOSCAR.lobster'      keys : element")
     print("run mode : 'lobster_spd_dos'           filenames : 'vasprun.xml' 'DOSCAR.lobster'      keys : None")
-    print("run mode : 'relax_convergence'         filenames : 'stroptdir1 stroptdir2'             keys : 'xkey ykey sortkey'")
+    print("run mode : 'static'         filenames : 'static1 static2'                              keys : 'xkey ykey sortkey'")
     print("                                                           (they are directories)")
 ### Arg-parser
 parser = argparse.ArgumentParser(
@@ -43,6 +43,16 @@ parser.add_argument('--xlim', type=str, default='None None',
 parser.add_argument('--ylim', type=str, default='None None',
                     help="figure ylimit, don't use colon \
                           ex) '-10 20', 'None 20'")
+parser.add_argument('--xlabel', type=str, default=None,
+                    help="xlabel")
+parser.add_argument('--ylabel', type=str, default=None,
+                    help="ylabel")
+parser.add_argument('--savefig', type=str, default=None,
+                    help="if this option persed, this does not show figure, just save")
+parser.add_argument('--title', type=str, default=None,
+                    help="title")
+parser.add_argument('--figsize', type=str, default=None,
+                    help="ex) '8 12'")
 args = parser.parse_args()
 
 ### analysis parser
@@ -71,15 +81,23 @@ def _load_yaml(yamlfile):
         data = yaml.load(f, Loader=Loader)
     return data
 
-def _get_final_vasperlog(dirname):
-    """
-    get final vasper-log.yaml file in dirname (relax directory)
-    """
-    optdirs = [ opt for opt in os.listdir(dirname) if 'opt' in opt]
-    optdirs.sort()
-    vasperlog_file = os.path.join(dirname, optdirs[-1], 'vasper-log.yaml')
-    vasperlog = _load_yaml(vasperlog_file)
-    return vasperlog
+def _set_fig_property():
+    # plt.rcParams['font.family'] = 'Times New Roman'
+    plt.rcParams['font.size'] = 13
+    plt.rcParams['axes.linewidth'] = 1.5
+    # plt.rcParams['xtics.major.size'] = 10
+    # plt.rcParams['xtics.major.width'] = 1.5
+
+
+# def _get_final_vasperlog(dirname):
+#     """
+#     get final vasper-log.yaml file in dirname (relax directory)
+#     """
+#     optdirs = [ opt for opt in os.listdir(dirname) if 'opt' in opt]
+#     optdirs.sort()
+#     vasperlog_file = os.path.join(dirname, optdirs[-1], 'vasper-log.yaml')
+#     vasperlog = _load_yaml(vasperlog_file)
+#     return vasperlog
 
 def get_data_from_vasperlogs(vasperlogs, xkey, ykey, sortkey):
     """
@@ -179,11 +197,12 @@ def read_data(runmode, filenames, keys=None):
         cdos = doscar.completedos
         element_dos = cdos.get_spd_dos()
         return element_dos
-    elif runmode == 'relax_convergence':
+    elif runmode == 'static':
         filenames = _reshape_parser(filenames)
         vasperfiles = []
         for dirname in filenames:
-            vasperfiles.append(_get_final_vasperlog(dirname))
+            # vasperfiles.append(_get_final_vasperlog(dirname))
+            vasperfiles.append(_load_yaml(os.path.join(dirname, 'vasper-log.yaml')))
         keys = _reshape_parser(keys)
         data = get_data_from_vasperlogs(vasperfiles, keys[0], keys[1], keys[2])
         return data
@@ -209,8 +228,10 @@ def make_plot(runmode, data, xlim, ylim):
         #plotter = pmgplotter.BSPlotter(bandstr)
         plotter = pmgplotter.BSPlotter(data)
         plotter.get_plot(ylim=ylim).show()
-    elif runmode == 'relax_convergence':
-        fig = plt.figure()
+    elif runmode == 'static':
+        if args.figsize is not None:
+            figsize = _reshape_parser(args.figsize)
+        fig = plt.figure(figsize=(int(figsize[0]), int(figsize[1])))
         ax = fig.add_subplot(111)
         keys = list(data.keys())
         keys.sort()
@@ -220,11 +241,19 @@ def make_plot(runmode, data, xlim, ylim):
             ax.plot(data_arr[0,:], data_arr[1,:], label=key, linestyle='dashed')
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
+        ax.set_xlabel(args.xlabel)
+        ax.set_ylabel(args.ylabel)
         ax.legend()
-        plt.show()
+        plt.title(args.title)
+        plt.tight_layout()
+        if args.savefig is None:
+            plt.show()
+        else:
+            plt.savefig(args.savefig)
     else:
         raise ValueError("runmode : %s is not supported" % args.runmode)
 
+_set_fig_property()
 xlim = _reshape_parser(args.xlim, objtype=float)
 ylim = _reshape_parser(args.ylim, objtype=float)
 data = read_data(args.runmode, args.filenames, args.keys)
